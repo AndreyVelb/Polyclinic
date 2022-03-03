@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="FacetManager">
+    <facet type="hibernate" name="Hibernate">
+      <configuration>
+        <datasource-map>
+          <unit-entry name="hibernate.cfg.xml" />
+          <unit-entry name="hibernate_new_db.cfg.xml" />
+          <unit-entry name="hibernate_new_db_jta.cfg.xml" />
+          <unit-entry name="hibernate_newdb.cfg.xml" />
+          <unit-entry name="hibernate_old_db.cfg.xml" />
+          <unit-entry name="hibernate_old_db_jta.cfg.xml" />
+          <unit-entry name="hibernate_olddb.cfg.xml" value="e8a9c47a-8621-49db-b27b-9ecaf2b9b289" />
+        </datasource-map>
+        <naming-strategy-map />
+        <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/../../src/main/resources/hibernate_new_db.cfg.xml" />
+        <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/../../src/main/resources/hibernate_old_db.cfg.xml" />
+      </configuration>
+    </facet>
+  </component>
+</module>

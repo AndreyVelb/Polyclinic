@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="polyclinic">
+    <output-path>$PROJECT_DIR$/out/artifacts/polyclinic</output-path>
+    <root id="archive" name="polyclinic.war">
+      <element id="artifact" artifact-name="Gradle : by.velb : polyclinic-1.0-SNAPSHOT.war (exploded)" />
+    </root>
+  </artifact>
+</component>

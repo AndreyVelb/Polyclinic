@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'by.velb'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+properties{
+    compileJava.options.encoding = 'UTF-8'
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.withType(Test) {
+        systemProperty 'file.encoding', 'UTF-8'
+    }
+
+    tasks.withType(JavaExec) {
+        systemProperty 'file.encoding', 'UTF-8'
+    }
+}
+
+java{
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
+
+
+}
+
+dependencies {
+    implementation 'org.hibernate:hibernate-core:5.6.0.Final'
+
+    implementation 'javax.servlet:servlet-api:2.5'
+    implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+
+    runtimeOnly 'org.postgresql:postgresql:42.3.1'
+    implementation 'org.postgresql:postgresql:9.3-1100-jdbc4'
+
+    implementation 'com.atomikos:transactions:5.0.8'
+    implementation 'com.atomikos:transactions-api:5.0.8'
+    implementation 'com.atomikos:atomikos-util:5.0.8'
+
+    implementation 'com.vladmihalcea:hibernate-types-52:2.14.0'
+    implementation 'org.slf4j:slf4j-api:1.7.32'
+    implementation 'org.slf4j:slf4j-log4j12:1.7.32'
+    implementation 'log4j:log4j:1.2.17'
+
+
+    implementation 'org.hibernate.validator:hibernate-validator:6.0.22.Final'
+    implementation 'javax.el:javax.el-api:3.0.0'
+    implementation 'org.glassfish:javax.el:3.0.0'
+
+    implementation 'org.codehaus.jackson:jackson-core-asl:1.9.13'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+    implementation 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1'
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testCompileOnly 'org.projectlombok:lombok:1.18.22'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+    testImplementation "org.testcontainers:postgresql:1.16.2"
+    testImplementation "org.testcontainers:junit-jupiter:1.16.2"
+    testImplementation 'com.vladmihalcea:hibernate-types-52:2.14.0'
+}
+
+test {
+    useJUnitPlatform()
+}
