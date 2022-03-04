@@ -1,22 +1,22 @@
-package servlet.performer.doctor;
+package servlet.performer.patient;
 
 import exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
-import servlet.performer.Performer;
 import service.mapper.util.HttpMethod;
 import service.mapper.util.UrlPath;
+import servlet.performer.Performer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class DoctorLogoutPerformer implements Performer{
-    private static final String path = UrlPath.DOCTOR_LOGOUT;
+public class PatientLogoutPerformer implements Performer {
+    private static final String path = UrlPath.PATIENT_LOGOUT;
     private static final ArrayList<String> performableMethods = new ArrayList<>();
 
-    public DoctorLogoutPerformer() {
+    public PatientLogoutPerformer() {
         performableMethods.add(HttpMethod.POST);
     }
 
@@ -31,7 +31,7 @@ public class DoctorLogoutPerformer implements Performer{
     @SneakyThrows
     private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
         request.getSession().invalidate();
-        response.sendRedirect(UrlPath.DOCTOR_LOGIN);
+        response.sendRedirect(UrlPath.PATIENT_LOGIN);
     }
 
     @Override
