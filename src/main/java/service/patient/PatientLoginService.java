@@ -1,30 +1,30 @@
 package service.patient;
 
-import entity.newdb.PatientNewDB;
+import entity.Patient;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
-import repository.newdb.PatientNewDBRepository;
+import repository.PatientRepository;
 import servlet.converter.request.PatientLoginConverter;
 import service.mapper.to.PatientDtoMapper;
 import service.dto.patient.PatientDto;
 import service.dto.patient.PatientLoginDto;
-import util.NewDBSessionPool;
+import service.mapper.util.SessionPool;
 
 import java.util.Optional;
 
 public class PatientLoginService {
     private final Session session;
 
-    private final PatientNewDBRepository patientRepository;
+    private final PatientRepository patientRepository;
 
     private final PatientLoginConverter patientLoginConverter;
     private final PatientDtoMapper patientDtoMapper;
 
 
     public PatientLoginService(){
-        this.session = NewDBSessionPool.getSession();
-        this.patientRepository = new PatientNewDBRepository(session);
+        this.session = SessionPool.getSession();
+        this.patientRepository = new PatientRepository(session);
         this.patientLoginConverter = new PatientLoginConverter();
         this.patientDtoMapper = new PatientDtoMapper();
     }
@@ -33,7 +33,7 @@ public class PatientLoginService {
     public Optional<PatientDto> authenticate(HttpServletRequest request){
         PatientLoginDto patientLoginDto = patientLoginConverter.convert(request);
         session.beginTransaction();
-        Optional<PatientNewDB> mayBePatient = patientRepository.authenticate(patientLoginDto.getLogin(), patientLoginDto.getPassword());
+        Optional<Patient> mayBePatient = patientRepository.authenticate(patientLoginDto.getLogin(), patientLoginDto.getPassword());
         if (mayBePatient.isPresent()){
             PatientDto patientDto = patientDtoMapper.mapFrom(mayBePatient.get());
             session.getTransaction().commit();

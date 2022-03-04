@@ -1,14 +1,14 @@
 package integration.util;
 
-import entity.newdb.AppointmentRecordNewDB;
-import entity.newdb.DoctorNewDB;
-import entity.newdb.PatientNewDB;
+import entity.AppointmentRecord;
+import entity.Doctor;
+import entity.Patient;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import util.HibernateUtil;
+import service.mapper.util.HibernateUtil;
 
 @Testcontainers
 public class HibernateTestUtil {
@@ -20,24 +20,15 @@ public class HibernateTestUtil {
 
     }
 
-    public static SessionFactory buildTestSessionFactoryForOLDdb(){
-        Configuration configuration = HibernateUtil.buildConfigurationForOLDdb();
+    public static SessionFactory buildTestSessionFactory(){
+        Configuration configuration = HibernateUtil.buildConfiguration();
+        configuration.configure("hibernate.cfg.xml");
         configuration.setProperty("hibernate.connection.url", postgres.getJdbcUrl());
         configuration.setProperty("hibernate.connection.username", postgres.getUsername());
         configuration.setProperty("hibernate.connection.password", postgres.getPassword());
-        configuration.configure("hibernate_old_db.cfg.xml");
-        return configuration.buildSessionFactory();
-    }
-
-    public static SessionFactory buildTestSessionFactoryForNEWdb(){
-        Configuration configuration = HibernateUtil.buildConfigurationForNEWdb();
-        configuration.configure("hibernate_new_db.cfg.xml");
-        configuration.setProperty("hibernate.connection.url", postgres.getJdbcUrl());
-        configuration.setProperty("hibernate.connection.username", postgres.getUsername());
-        configuration.setProperty("hibernate.connection.password", postgres.getPassword());
-        configuration.addAnnotatedClass(DoctorNewDB.class);
-        configuration.addAnnotatedClass(PatientNewDB.class);
-        configuration.addAnnotatedClass(AppointmentRecordNewDB.class);
+        configuration.addAnnotatedClass(Doctor.class);
+        configuration.addAnnotatedClass(Patient.class);
+        configuration.addAnnotatedClass(AppointmentRecord.class);
         return configuration.buildSessionFactory();
     }
 }

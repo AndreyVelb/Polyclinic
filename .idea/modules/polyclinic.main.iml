@@ -13,7 +13,7 @@
           <unit-entry name="hibernate_olddb.cfg.xml" value="e8a9c47a-8621-49db-b27b-9ecaf2b9b289" />
         </datasource-map>
         <naming-strategy-map />
-        <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/../../src/main/resources/hibernate_new_db.cfg.xml" />
+        <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/../../src/main/resources/hibernate.cfg.xml" />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/../../src/main/resources/hibernate_old_db.cfg.xml" />
       </configuration>
     </facet>

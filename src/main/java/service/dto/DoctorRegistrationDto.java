@@ -1,7 +1,7 @@
 package service.dto;
 
 import entity.DoctorSpeciality;
-import entity.newdb.Qualification;
+import entity.Qualification;
 import lombok.Builder;
 import lombok.Value;
 import service.dto.validator.DoctorMiddleNameConstraint;

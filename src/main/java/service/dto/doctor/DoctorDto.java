@@ -1,7 +1,7 @@
 package service.dto.doctor;
 
 import entity.DoctorSpeciality;
-import entity.newdb.Qualification;
+import entity.Qualification;
 import lombok.*;
 import service.dto.Dto;
 

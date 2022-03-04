@@ -1,16 +1,16 @@
 package service.doctor;
 
-import entity.newdb.DoctorNewDB;
+import entity.Doctor;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
-import repository.newdb.DoctorNewDBRepository;
+import repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
 import servlet.converter.request.DoctorLoginConverter;
 import service.mapper.to.DoctorDtoMapper;
 import service.dto.doctor.DoctorLoginDto;
 import service.dto.doctor.DoctorDto;
-import util.NewDBSessionPool;
+import service.mapper.util.SessionPool;
 
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ import java.util.Optional;
 public class DoctorLoginService {
     private final Session session;
 
-    private final DoctorNewDBRepository doctorRepository;
+    private final DoctorRepository doctorRepository;
 
     private final DoctorLoginConverter doctorLoginConverter;
     private final DoctorDtoMapper doctorDtoMapper;
@@ -32,8 +32,8 @@ public class DoctorLoginService {
 //    private final ApRecordFromOldDBToNewDBMapper apRecordFromOldDBToNewDBMapper;
 
     public DoctorLoginService(){
-        this.session = NewDBSessionPool.getSession();
-        this.doctorRepository = new DoctorNewDBRepository(session);
+        this.session = SessionPool.getSession();
+        this.doctorRepository = new DoctorRepository(session);
         this.doctorLoginConverter = new DoctorLoginConverter();
         this.doctorDtoMapper = new DoctorDtoMapper();
     }
@@ -42,7 +42,7 @@ public class DoctorLoginService {
     public Optional<DoctorDto> authenticate(HttpServletRequest request) {
         DoctorLoginDto doctorLoginDto = doctorLoginConverter.convert(request);
         session.beginTransaction();
-        Optional<DoctorNewDB> mayBeDoctor = doctorRepository.authenticate(doctorLoginDto.getLogin(), doctorLoginDto.getPassword());
+        Optional<Doctor> mayBeDoctor = doctorRepository.authenticate(doctorLoginDto.getLogin(), doctorLoginDto.getPassword());
         if (mayBeDoctor.isPresent()){
             DoctorDto doctorDto = doctorDtoMapper.mapFrom(mayBeDoctor.get());
             session.getTransaction().commit();

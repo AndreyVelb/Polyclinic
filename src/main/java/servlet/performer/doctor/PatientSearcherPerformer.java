@@ -9,8 +9,8 @@ import servlet.converter.response.PatientDtoListConverter;
 import servlet.performer.Performer;
 import servlet.response.JsonResponse;
 import service.dto.patient.PatientDto;
-import util.HttpMethod;
-import util.UrlPath;
+import service.mapper.util.HttpMethod;
+import service.mapper.util.UrlPath;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

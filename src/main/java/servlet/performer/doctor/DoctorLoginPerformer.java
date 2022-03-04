@@ -8,8 +8,8 @@ import service.doctor.DoctorLoginService;
 import exception.NotAuthenticatedException;
 import service.dto.doctor.DoctorDto;
 import servlet.performer.Performer;
-import util.HttpMethod;
-import util.UrlPath;
+import service.mapper.util.HttpMethod;
+import service.mapper.util.UrlPath;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

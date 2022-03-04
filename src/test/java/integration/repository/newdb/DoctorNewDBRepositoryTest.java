@@ -1,17 +1,5 @@
 package integration.repository.newdb;
 
-import entity.DoctorSpeciality;
-import entity.newdb.DoctorNewDB;
-import entity.newdb.Qualification;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.*;
-import repository.newdb.DoctorNewDBRepository;
-import integration.util.HibernateTestUtil;
-
-import java.util.ArrayList;
-import java.util.Optional;
-
 //class DoctorNewDBRepositoryTest implements NEWdbRepositoryTest<Long, DoctorNewDB> {
 //    private static SessionFactory sessionFactory;
 //    private static Session session;

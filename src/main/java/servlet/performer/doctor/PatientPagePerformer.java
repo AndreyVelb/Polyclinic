@@ -12,14 +12,12 @@ import service.dto.patient.PatientDto;
 import servlet.converter.response.PatientDtoConverter;
 import servlet.performer.Performer;
 import servlet.response.JsonResponse;
-import util.HttpMethod;
-import util.UrlPath;
+import service.mapper.util.HttpMethod;
+import service.mapper.util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 

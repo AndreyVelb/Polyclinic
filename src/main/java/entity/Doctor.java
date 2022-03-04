@@ -1,7 +1,6 @@
-package entity.newdb;
+package entity;
 
 
-import entity.DoctorSpeciality;
 import lombok.*;
 import org.hibernate.annotations.ColumnTransformer;
 
@@ -16,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "polyclinics_doctors")
-public class DoctorNewDB implements BaseEntityNewDB<Long>{
+public class Doctor implements BaseEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +46,6 @@ public class DoctorNewDB implements BaseEntityNewDB<Long>{
     private String password;
 
     @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<AppointmentRecordNewDB> recordsWrittenByDoctor;
+    private List<AppointmentRecord> recordsWrittenByDoctor;
 
 }

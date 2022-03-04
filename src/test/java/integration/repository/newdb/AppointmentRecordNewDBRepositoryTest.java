@@ -1,19 +1,19 @@
 //package integration.repository.newdb;
 //
 //import entity.DoctorSpeciality;
-//import entity.newdb.AppointmentRecordNewDB;
-//import entity.newdb.DoctorNewDB;
-//import entity.newdb.PatientNewDB;
-//import entity.newdb.Qualification;
+//import entity.AppointmentRecordNewDB;
+//import entity.DoctorNewDB;
+//import entity.PatientNewDB;
+//import entity.Qualification;
 //import org.hibernate.Session;
 //import org.hibernate.SessionFactory;
 //import org.junit.jupiter.api.AfterAll;
 //import org.junit.jupiter.api.Assertions;
 //import org.junit.jupiter.api.BeforeAll;
 //import org.junit.jupiter.api.Test;
-//import repository.newdb.AppointmentRecordNewDBRepository;
-//import repository.newdb.DoctorNewDBRepository;
-//import repository.newdb.PatientNewDBRepository;
+//import repository.AppointmentRecordNewDBRepository;
+//import repository.DoctorNewDBRepository;
+//import repository.PatientNewDBRepository;
 //import integration.util.HibernateTestUtil;
 //
 //import java.time.LocalDate;

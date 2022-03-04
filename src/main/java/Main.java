@@ -1,11 +1,3 @@
-import entity.DoctorSpeciality;
-import entity.newdb.DoctorNewDB;
-import entity.newdb.Qualification;
-import org.hibernate.Session;
-import repository.newdb.DoctorNewDBRepository;
-import util.HibernateUtil;
-import util.NewDBSessionPool;
-
 //public class Main {
 //    public static void main(String[] args) {
 //        Session session = NewDBSessionPool.getSession();

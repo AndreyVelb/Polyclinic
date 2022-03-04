@@ -1,13 +1,13 @@
 package service.mapper.to;
 
-import entity.newdb.PatientNewDB;
+import entity.Patient;
 import service.mapper.Mapper;
 import service.dto.patient.PatientDto;
 
-public class PatientDtoMapper implements Mapper<PatientNewDB, PatientDto> {
+public class PatientDtoMapper implements Mapper<Patient, PatientDto> {
 
     @Override
-    public PatientDto mapFrom(PatientNewDB patient) {
+    public PatientDto mapFrom(Patient patient) {
         return PatientDto.builder()
                 .id(patient.getId())
                 .lastName(patient.getLastName())

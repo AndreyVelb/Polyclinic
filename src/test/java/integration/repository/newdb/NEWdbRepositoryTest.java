@@ -1,6 +1,6 @@
 package integration.repository.newdb;
 
-import entity.newdb.BaseEntityNewDB;
+import entity.BaseEntity;
 import integration.repository.RepositoryTestInterface;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public interface NEWdbRepositoryTest <K extends Serializable, E extends BaseEntityNewDB<K>> extends RepositoryTestInterface<K, E> {
+public interface NEWdbRepositoryTest <K extends Serializable, E extends BaseEntity<K>> extends RepositoryTestInterface<K, E> {
     @Test
     @Override
     void update();

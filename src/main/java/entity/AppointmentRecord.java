@@ -1,4 +1,4 @@
-package entity.newdb;
+package entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Table(name = "appointment_records")
-public class AppointmentRecordNewDB implements BaseEntityNewDB<Long>{
+public class AppointmentRecord implements BaseEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +22,11 @@ public class AppointmentRecordNewDB implements BaseEntityNewDB<Long>{
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "patient_id")
-    private PatientNewDB patient;
+    private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "doctor_id")
-    private DoctorNewDB doctor;
+    private Doctor doctor;
 
     @Column(name = "visit_date")
     private LocalDate visitDate;

@@ -1,14 +1,14 @@
 package service.mapper.from.dto;
 
 import service.dto.AppointmentRecordDto;
-import entity.newdb.AppointmentRecordNewDB;
+import entity.AppointmentRecord;
 import service.mapper.Mapper;
 
-public class AppointmentRecordMapper implements Mapper<AppointmentRecordDto, AppointmentRecordNewDB> {
+public class AppointmentRecordMapper implements Mapper<AppointmentRecordDto, AppointmentRecord> {
 
     @Override
-    public AppointmentRecordNewDB mapFrom(AppointmentRecordDto dto) {
-        return AppointmentRecordNewDB.builder()
+    public AppointmentRecord mapFrom(AppointmentRecordDto dto) {
+        return AppointmentRecord.builder()
                 .patient(dto.getPatient())
                 .doctor(dto.getDoctor())
                 .visitDate(dto.getVisitDate())

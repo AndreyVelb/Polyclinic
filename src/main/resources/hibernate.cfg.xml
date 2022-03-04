@@ -20,9 +20,9 @@
 <!--    <property name="hibernate.c3p0.acquire_increment">5</property>-->
 <!--    <property name="hibernate.c3p0.timeout">1800</property>-->
 
-    <mapping class="entity.newdb.PatientNewDB"/>
-    <mapping class="entity.newdb.DoctorNewDB"/>
-    <mapping class="entity.newdb.AppointmentRecordNewDB"/>
+    <mapping class="entity.Patient"/>
+    <mapping class="entity.Doctor"/>
+    <mapping class="entity.AppointmentRecord"/>
 
     <!-- DB schema will be updated if needed -->
     <!-- <property name="hibernate.hbm2ddl.auto">update</property> -->

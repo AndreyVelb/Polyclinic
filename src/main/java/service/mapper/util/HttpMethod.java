@@ -1,4 +1,4 @@
-package util;
+package service.mapper.util;
 
 import lombok.experimental.UtilityClass;
 

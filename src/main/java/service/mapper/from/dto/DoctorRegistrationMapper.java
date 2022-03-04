@@ -1,14 +1,14 @@
 package service.mapper.from.dto;
 
 import service.dto.DoctorRegistrationDto;
-import entity.newdb.DoctorNewDB;
+import entity.Doctor;
 import service.mapper.Mapper;
 
-public class DoctorRegistrationMapper implements Mapper<DoctorRegistrationDto, DoctorNewDB> {
+public class DoctorRegistrationMapper implements Mapper<DoctorRegistrationDto, Doctor> {
 
     @Override
-    public DoctorNewDB mapFrom(DoctorRegistrationDto dto) {
-        return DoctorNewDB.builder()
+    public Doctor mapFrom(DoctorRegistrationDto dto) {
+        return Doctor.builder()
                 .lastName(dto.getLastName())
                 .firstName(dto.getFirstName())
                 .middleName(dto.getMiddleName())

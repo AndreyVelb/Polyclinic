@@ -1,4 +1,4 @@
-package entity.newdb;
+package entity;
 
 public enum Qualification {
     SIXTH, FIFTH, FOURTH, THIRD, SECOND, FIRST;

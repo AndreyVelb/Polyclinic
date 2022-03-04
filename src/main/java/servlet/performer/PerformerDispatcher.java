@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import servlet.performer.doctor.DoctorLoginPerformer;
 import servlet.performer.doctor.PatientPagePerformer;
 import servlet.performer.doctor.PatientSearcherPerformer;
+import servlet.performer.patient.PatientLoginPerformer;
+import servlet.performer.patient.PatientRegistrationPerformer;
 
 import java.util.*;
 

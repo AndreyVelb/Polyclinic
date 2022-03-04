@@ -1,10 +1,8 @@
-package repository.old_db;
+package repository;
 
-import entity.olddb.BaseEntityOldDB;
+import entity.BaseEntity;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
-import org.postgresql.util.PSQLException;
-import repository.Repository;
 
 import javax.persistence.criteria.CriteriaQuery;
 import java.io.Serializable;
@@ -12,12 +10,12 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public abstract class RepositoryBaseOldDB<K extends Serializable, E extends BaseEntityOldDB<K>> implements Repository<K, E> {
+public abstract class AbstractRepository<K extends Serializable, E extends BaseEntity<K>> implements Repository<K, E> {
     private final Class<E> clazz;
     private final Session session;
 
     @Override
-    public E save (E entity) {
+    public E save (E entity){
         session.save(entity);
         return entity;
     }

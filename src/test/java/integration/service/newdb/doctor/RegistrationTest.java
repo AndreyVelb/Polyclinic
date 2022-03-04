@@ -2,7 +2,7 @@
 //
 //import dto.DoctorRegistrationDTO;
 //import entity.DoctorSpeciality;
-//import entity.newdb.Qualification;
+//import entity.Qualification;
 //import integration.util.HibernateTestUtil;
 //import service.mapper.dto.DoctorRegistrationMapper;
 //import org.hibernate.Session;
@@ -11,7 +11,7 @@
 //import org.junit.jupiter.api.Assertions;
 //import org.junit.jupiter.api.BeforeAll;
 //import org.junit.jupiter.api.Test;
-//import repository.newdb.DoctorNewDBRepository;
+//import repository.DoctorNewDBRepository;
 //import service.DoctorService;
 //
 //import javax.validation.ConstraintViolation;

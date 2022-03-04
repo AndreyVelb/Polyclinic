@@ -1,7 +1,7 @@
 package service.dto;
 
-import entity.newdb.DoctorNewDB;
-import entity.newdb.PatientNewDB;
+import entity.Doctor;
+import entity.Patient;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -11,9 +11,9 @@ import java.time.LocalDate;
 @Data
 public class AppointmentRecordDto {
 
-    PatientNewDB patient;
+    Patient patient;
 
-    DoctorNewDB doctor;
+    Doctor doctor;
 
     LocalDate visitDate;
 
