@@ -2,6 +2,7 @@ package servlet.performer.patient;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import service.patient.PatientRegistrationService;
 import servlet.performer.Performer;
@@ -10,16 +11,14 @@ import util.UrlPath;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Set;
 
+@RequiredArgsConstructor
 public class PatientRegistrationPerformer implements Performer {
     private static final String path = UrlPath.PATIENT_REGISTRATION;
-    private static final ArrayList<String> performableMethods = new ArrayList<>();
+    private static final Set<String> performableMethods = Set.of(HttpMethod.POST);
 
-    private PatientRegistrationService service = new PatientRegistrationService();
-
-    public PatientRegistrationPerformer(){
-        performableMethods.add(HttpMethod.POST);
-    }
+    private final PatientRegistrationService service;
 
     @Override
     @SneakyThrows

@@ -3,6 +3,7 @@ package servlet.performer.patient;
 import exception.NotAuthenticatedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import service.patient.PatientLoginService;
 import service.dto.patient.PatientDto;
@@ -14,16 +15,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Set;
 
+@RequiredArgsConstructor
 public class PatientLoginPerformer implements Performer {
     private static final String path = UrlPath.PATIENT_LOGIN;
-    private static final ArrayList<String> performableMethods = new ArrayList<>();
+    private static final Set<String> performableMethods = Set.of(HttpMethod.POST);
 
-    private final PatientLoginService service = new PatientLoginService();
-
-    public PatientLoginPerformer(){
-        performableMethods.add(HttpMethod.POST);
-    }
+    private final PatientLoginService service;
 
     @Override
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException {

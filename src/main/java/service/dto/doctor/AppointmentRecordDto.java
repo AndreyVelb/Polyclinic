@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import service.dto.Dto;
 import service.dto.patient.PatientDto;
 import servlet.converter.serializer.LocalDateSerializer;
 
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 @Builder
-public class AppointmentRecordDto {
+public class AppointmentRecordDto implements Dto {
 
     Long id;
 

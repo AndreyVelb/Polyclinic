@@ -3,6 +3,7 @@ package servlet.performer.doctor;
 import exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import service.doctor.AppointmentRecordCreateService;
 import service.dto.doctor.AppointmentRecordDto;
@@ -14,19 +15,19 @@ import util.UrlPath;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 
+@RequiredArgsConstructor
 public class AppointmentRecordCreatePerformer implements Performer {
     private static final String path = UrlPath.DOCTOR_PATH_WITHOUT_INFO;
     private static final String subPath = "writing-record";
-    private static final ArrayList<String> performableMethods = new ArrayList<>();
+    private static final Set<String> performableMethods = Set.of(HttpMethod.POST);
 
-    private final AppointmentRecordCreateService service = new AppointmentRecordCreateService();
+    private final AppointmentRecordCreateService service;
 
-    public AppointmentRecordCreatePerformer(){
-        performableMethods.add(HttpMethod.POST);
-    }
 
     @Override
     @SneakyThrows

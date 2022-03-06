@@ -4,6 +4,7 @@ import entity.AppointmentRecord;
 import exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import service.doctor.AppointmentRecordCreateService;
 import service.doctor.AppointmentRecordService;
@@ -18,21 +19,19 @@ import util.UrlPath;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+@RequiredArgsConstructor
 public class AppointmentRecordPerformer implements Performer {
     private static final String path = UrlPath.DOCTOR_PATH_WITHOUT_INFO;
     private static final String subPath = "records";
-    private static final ArrayList<String> performableMethods = new ArrayList<>();
+    private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
-    private final AppointmentRecordService service = new AppointmentRecordService();
-    private final AppointmentRecordConverter appointmentRecordConverter = new AppointmentRecordConverter();
-
-    public AppointmentRecordPerformer(){
-        performableMethods.add(HttpMethod.GET);
-    }
+    private final AppointmentRecordService service;
+    private final AppointmentRecordConverter appointmentRecordConverter;
 
     @Override
     @SneakyThrows

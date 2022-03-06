@@ -1,17 +1,20 @@
 package servlet.converter.request;
 
+import lombok.RequiredArgsConstructor;
 import org.codehaus.jackson.map.ObjectMapper;
 import service.dto.doctor.PatientLastNameDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+@RequiredArgsConstructor
 public class PatientLastNameConverter implements RequestConverter<HttpServletRequest, PatientLastNameDto>{
-    ObjectMapper objectMapper = new ObjectMapper();
-    StringBuffer stringBuffer = new StringBuffer();
+    private final ObjectMapper objectMapper;
+
 
     @Override
     public PatientLastNameDto convert(HttpServletRequest jsonRequest) throws IOException {
+        StringBuffer stringBuffer = new StringBuffer();
         String line = null;
 
         try (var reader = jsonRequest.getReader()){

@@ -1,6 +1,7 @@
 package service.patient;
 
 import exception.ServerTechnicalProblemsException;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import exception.AlreadyExistsException;
 import exception.DtoValidationException;
@@ -12,7 +13,6 @@ import entity.Patient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
-import org.hibernate.annotations.DynamicInsert;
 import repository.PatientRepository;
 import service.mapper.PatientMapper;
 import servlet.converter.request.RegistrationPatientConverter;
@@ -24,37 +24,26 @@ import java.io.PrintWriter;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
-@DynamicInsert
+@RequiredArgsConstructor
 public class PatientRegistrationService {
-    private final Session session;
 
-    private final PatientRepository patientNewDBRepository;
+    private final PatientRepository patientRepository;
 
     private final RegistrationPatientConverter registrationPatientConverter;
-    private final PatientMapper registrationPatientMapper;
+    private final PatientMapper patientMapper;
     private final PatientDtoMapper patientDtoMapper;
 
     private final DtoValidator dtoValidator;
 
-    public PatientRegistrationService(){
-        this.session = SessionPool.getSession();
-        this.patientNewDBRepository = new PatientRepository(session);
-        this.registrationPatientConverter = new RegistrationPatientConverter();
-        this.registrationPatientMapper = new PatientMapper();
-        this.dtoValidator = new DtoValidator();
-        this.patientDtoMapper = new PatientDtoMapper();
-    }
-
     @SneakyThrows
     public void registration(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws AlreadyExistsException, IOException, ServerTechnicalProblemsException, DtoValidationException {
+        Session session = SessionPool.getSession();
         PatientRegistrationResponse registrationResponse = new PatientRegistrationResponse();
         Patient patient = createPatient(request);
-//            new ExceptionResponse().send(writer, response, exception, SC_UNSUPPORTED_MEDIA_TYPE);
-//            new ExceptionResponse().send(writer, response, exception, SC_BAD_REQUEST);;
 
         session.beginTransaction();
-        if(patientNewDBRepository.registerPatient(patient)){
-            Patient registeredPatient = patientNewDBRepository.findByLogin(patient.getLogin()).get();
+        if(patientRepository.registerPatient(patient, session)){
+            Patient registeredPatient = patientRepository.findByLogin(patient.getLogin(), session).get();
             PatientDto patientDto = patientDtoMapper.mapFrom(registeredPatient);
             session.getTransaction().commit();
             registrationResponse.send(response.getWriter(), response, patientDto, SC_CREATED);
@@ -65,7 +54,7 @@ public class PatientRegistrationService {
         Patient patient = new Patient();
         PatientRegistrationDto registrationDto = registrationPatientConverter.convert(request);
         if (dtoValidator.isValid(registrationDto)) {
-            return registrationPatientMapper.mapFrom(registrationDto);
+            return patientMapper.mapFrom(registrationDto);
         }
         return patient;
     }

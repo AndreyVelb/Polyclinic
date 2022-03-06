@@ -3,6 +3,7 @@ package servlet.performer.doctor;
 import exception.MethodNotAllowedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import service.doctor.DoctorLoginService;
 import exception.NotAuthenticatedException;
@@ -14,16 +15,14 @@ import util.UrlPath;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Set;
 
+@RequiredArgsConstructor
 public class DoctorLoginPerformer implements Performer {
     private static final String path = UrlPath.DOCTOR_LOGIN;
-    private static final ArrayList<String> performableMethods = new ArrayList<>();
+    private static final Set<String> performableMethods = Set.of(HttpMethod.POST);
 
-    private final DoctorLoginService service = new DoctorLoginService();
-
-    public DoctorLoginPerformer(){
-        performableMethods.add(HttpMethod.POST);
-    }
+    private final DoctorLoginService service;
 
     @Override
     @SneakyThrows

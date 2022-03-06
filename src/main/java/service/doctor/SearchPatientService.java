@@ -3,6 +3,8 @@ package service.doctor;
 import entity.Patient;
 import exception.DtoValidationException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.PatientRepository;
 import servlet.converter.request.PatientLastNameConverter;
@@ -16,8 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class SearchPatientService {
-    private final Session session;
 
     private final PatientRepository patientRepository;
 
@@ -26,25 +28,20 @@ public class SearchPatientService {
 
     private final DtoValidator dtoValidator;
 
-    public SearchPatientService(){
-        this.session = SessionPool.getSession();
-        this.patientRepository = new PatientRepository(session);
-        this.patientLastNameConverter = new PatientLastNameConverter();
-        this.dtoValidator = new DtoValidator();
-        this.patientDtoMapper = new PatientDtoMapper();
-    }
-
-    public List<PatientDto> findPatientsByLastName(HttpServletRequest request) throws IOException, DtoValidationException {
-        PatientLastNameDto patientLastNameDto = patientLastNameConverter.convert(request);
-
+    @SneakyThrows
+    public List<PatientDto> findPatientsByLastName(HttpServletRequest request) {
+        Session session = SessionPool.getSession();
+        PatientLastNameDto patientLastNameDto = PatientLastNameDto.builder()
+                .lastName(request.getParameter("lastName"))
+                .build();                                        //patientLastNameConverter.convert(request);
         ArrayList<Patient> patientsList = new ArrayList<>();
         if (dtoValidator.isValid(patientLastNameDto)){
             session.beginTransaction();
-            patientsList = patientRepository.findByLastName(patientLastNameDto.getLastName());
+            patientsList = patientRepository.findByLastName(patientLastNameDto.getLastName(), session);
             session.getTransaction().commit();
         }
         ArrayList<PatientDto> dtoPatientsList = new ArrayList<>();
-        patientsList.forEach(patient -> dtoPatientsList.add(patientDtoMapper.mapFrom(patient))); //?????????
+        patientsList.forEach(patient -> dtoPatientsList.add(patientDtoMapper.mapFrom(patient)));
         return dtoPatientsList;
     }
 }

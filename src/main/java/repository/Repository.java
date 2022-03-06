@@ -2,6 +2,7 @@ package repository;
 
 import entity.BaseEntity;
 
+import org.hibernate.Session;
 import org.postgresql.util.PSQLException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -10,13 +11,14 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public interface Repository <K extends Serializable, E extends BaseEntity<K>>{
-    E save (E entity) throws PSQLException;
 
-    void delete(K id);
+    E save (E entity, Session session) throws PSQLException;
 
-    void update(E entity);
+    void delete(K id, Session session);
 
-    Optional<E> findById(K id);
+    void update(E entity, Session session);
 
-    ArrayList<E> findAll();
+    Optional<E> findById(K id, Session session);
+
+    ArrayList<E> findAll(Session session);
 }

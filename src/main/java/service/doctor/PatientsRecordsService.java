@@ -4,6 +4,7 @@ import entity.AppointmentRecord;
 import entity.Patient;
 import exception.PageNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.AppointmentRecordRepository;
@@ -18,35 +19,20 @@ import util.SessionPool;
 
 import java.util.*;
 
+@RequiredArgsConstructor
 public class PatientsRecordsService {
-    private final Session session;
 
     private final PatientRepository patientRepository;
-    private final AppointmentRecordRepository appointmentRecordRepository;
-    private final DoctorRepository doctorRepository;
 
-    private final AppointmentRecordRequestConverter appointmentRecordConverter;
-    private final DoctorDtoMapper doctorDtoMapper;
-    private final AppointmentRecordMapper appointmentRecordMapper;
     private final AppointmentRecordDtoMapper appointmentRecordDtoMapper;
-
-    public PatientsRecordsService(){
-        this.session = SessionPool.getSession();
-        this.patientRepository = new PatientRepository(session);
-        this.doctorRepository = new DoctorRepository(session);
-        this.appointmentRecordRepository = new AppointmentRecordRepository(session);
-        this.appointmentRecordConverter = new AppointmentRecordRequestConverter();
-        this.doctorDtoMapper = new DoctorDtoMapper();
-        this.appointmentRecordMapper = new AppointmentRecordMapper();
-        this.appointmentRecordDtoMapper = new AppointmentRecordDtoMapper();
-    }
 
     @SneakyThrows
     public List<AppointmentRecordDto> getPatientsRecordsDto(HttpServletRequest request){
+        Session session = SessionPool.getSession();
         Long id = extractPatientIdFromRequest(request);
         try {
             session.beginTransaction();
-            Optional<Patient> patient = patientRepository.findById(id);
+            Optional<Patient> patient = patientRepository.findById(id, session);
             if (patient.isPresent()){
                 List<AppointmentRecord> patientsRecords = patient.get().getPatientsRecords();
                 List<AppointmentRecordDto> dtoRecordsList = new ArrayList<>();
@@ -60,11 +46,6 @@ public class PatientsRecordsService {
         }
         return List.of();
     }
-
-//    private List<AppointmentRecordDto> mapToAppRecordDtoList(List<AppointmentRecord> patientsRecords){
-//
-//        return dtoRecordsList;
-//    }
 
     private Long extractPatientIdFromRequest(HttpServletRequest request){
         String[] requestPathParts = request.getPathInfo().split("/");

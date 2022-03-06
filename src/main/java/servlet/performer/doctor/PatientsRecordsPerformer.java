@@ -3,6 +3,7 @@ package servlet.performer.doctor;
 import exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import service.doctor.PatientsRecordsService;
 import service.dto.doctor.AppointmentRecordDto;
@@ -16,21 +17,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+@RequiredArgsConstructor
 public class PatientsRecordsPerformer implements Performer {
     private static final String path = UrlPath.DOCTOR_PATH_WITHOUT_INFO;
     private static final String subPath = "records";
-    private static final ArrayList<String> performableMethods = new ArrayList<>();
+    private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
-    private final PatientsRecordsService service = new PatientsRecordsService();
+    private final PatientsRecordsService service;
 
-    private final AppointmentRecordDtoListConverter appointmentRecordConverter = new AppointmentRecordDtoListConverter();
-
-    public PatientsRecordsPerformer(){
-        performableMethods.add(HttpMethod.GET);
-    }
+    private final AppointmentRecordDtoListConverter appointmentRecordConverter;
 
     @Override
     @SneakyThrows

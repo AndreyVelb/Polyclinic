@@ -6,6 +6,7 @@ import exception.NotAuthenticatedException;
 import exception.ServerTechnicalProblemsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import service.doctor.MedicCardService;
 import service.dto.patient.PatientDto;
@@ -18,20 +19,18 @@ import util.UrlPath;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+@RequiredArgsConstructor
 public class MedicCardPerformer implements Performer {
     private static final String path = UrlPath.DOCTOR_PATH_WITHOUT_INFO;
-    private static final ArrayList<String> performableMethods = new ArrayList<>();
+    private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
-    private static final MedicCardService service = new MedicCardService();
+    private final MedicCardService service;
 
-    private static final PatientDtoConverter patientDtoConverter = new PatientDtoConverter();
-
-    public MedicCardPerformer() {
-        performableMethods.add(HttpMethod.GET);
-    }
+    private final PatientDtoConverter patientDtoConverter;
 
     @Override
     @SneakyThrows

@@ -3,6 +3,7 @@ package servlet.performer.doctor;
 import exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jdk.jfr.Registered;
 import lombok.SneakyThrows;
 import servlet.performer.Performer;
 import util.HttpMethod;
@@ -10,14 +11,12 @@ import util.UrlPath;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Set;
 
+@Registered
 public class DoctorLogoutPerformer implements Performer{
     private static final String path = UrlPath.DOCTOR_LOGOUT;
-    private static final ArrayList<String> performableMethods = new ArrayList<>();
-
-    public DoctorLogoutPerformer() {
-        performableMethods.add(HttpMethod.POST);
-    }
+    private static final Set<String> performableMethods = Set.of(HttpMethod.POST);
 
     @Override
     @SneakyThrows

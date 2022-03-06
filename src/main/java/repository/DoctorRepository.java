@@ -3,17 +3,17 @@ package repository;
 import entity.Doctor;
 import org.hibernate.Session;
 
+import javax.print.Doc;
 import java.util.Optional;
 
-public class DoctorRepository extends AbstractRepository<Long, Doctor> {
-    private final Session session;
 
-    public DoctorRepository(Session session) {
-        super(Doctor.class, session);
-        this.session = session;
+public class DoctorRepository extends AbstractRepository<Long, Doctor>{
+
+    public DoctorRepository() {
+        super(Doctor.class);
     }
 
-    public Optional<Doctor> authenticate(String login, String password) {
+    public Optional<Doctor> authenticate(String login, String password, Session session) {
         return Optional.ofNullable(session.createQuery("select doctor from Doctor doctor " +
                         "where doctor.login = :login and doctor.password = (crypt(:password, doctor.password))", Doctor.class)
                 .setParameter("login", login)
@@ -21,12 +21,10 @@ public class DoctorRepository extends AbstractRepository<Long, Doctor> {
                 .uniqueResult());
     }
 
-    public Optional<Doctor> findByLogin(String login){
+    public Optional<Doctor> findByLogin(String login, Session session){
         return Optional.ofNullable(session.createQuery("select doctor from Doctor doctor " +
                         "where doctor.login = :login", Doctor.class)
                 .setParameter("login", login)
                 .uniqueResult());
     }
-
-
 }

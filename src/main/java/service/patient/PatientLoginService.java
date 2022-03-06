@@ -2,6 +2,7 @@ package service.patient;
 
 import entity.Patient;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.PatientRepository;
@@ -13,27 +14,20 @@ import util.SessionPool;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class PatientLoginService {
-    private final Session session;
 
     private final PatientRepository patientRepository;
 
     private final PatientLoginConverter patientLoginConverter;
     private final PatientDtoMapper patientDtoMapper;
 
-
-    public PatientLoginService(){
-        this.session = SessionPool.getSession();
-        this.patientRepository = new PatientRepository(session);
-        this.patientLoginConverter = new PatientLoginConverter();
-        this.patientDtoMapper = new PatientDtoMapper();
-    }
-
     @SneakyThrows
     public Optional<PatientDto> authenticate(HttpServletRequest request){
+        Session session = SessionPool.getSession();
         PatientLoginDto patientLoginDto = patientLoginConverter.convert(request);
         session.beginTransaction();
-        Optional<Patient> mayBePatient = patientRepository.authenticate(patientLoginDto.getLogin(), patientLoginDto.getPassword());
+        Optional<Patient> mayBePatient = patientRepository.authenticate(patientLoginDto.getLogin(), patientLoginDto.getPassword(), session);
         if (mayBePatient.isPresent()){
             PatientDto patientDto = patientDtoMapper.mapFrom(mayBePatient.get());
             session.getTransaction().commit();

@@ -1,14 +1,15 @@
 package servlet.converter.request;
 
+import lombok.RequiredArgsConstructor;
 import org.codehaus.jackson.map.ObjectMapper;
 import service.dto.doctor.AppointmentRecordRequestDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class AppointmentRecordRequestConverter implements RequestConverter<HttpServletRequest, AppointmentRecordRequestDto>{
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @Override
     public AppointmentRecordRequestDto convert(HttpServletRequest jsonRequest) throws IOException {

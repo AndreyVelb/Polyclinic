@@ -3,6 +3,7 @@ package servlet.performer.doctor;
 import exception.MethodNotAllowedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import service.doctor.SearchPatientService;
 import servlet.converter.response.PatientDtoListConverter;
@@ -15,20 +16,18 @@ import util.UrlPath;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+@RequiredArgsConstructor
 public class SearchPatientPerformer implements Performer {
     private static final String path = UrlPath.DOCTOR_PATH_WITHOUT_INFO;
-    private static final ArrayList<String> performableMethods = new ArrayList<>();
+    private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
-    private final SearchPatientService service = new SearchPatientService();
+    private final SearchPatientService service;
 
-    private final PatientDtoListConverter patientListConverter = new PatientDtoListConverter();
-
-    public SearchPatientPerformer() {
-        performableMethods.add(HttpMethod.GET);
-    }
+    private final PatientDtoListConverter patientListConverter;
 
     @Override
     @SneakyThrows

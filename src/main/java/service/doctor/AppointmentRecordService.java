@@ -7,6 +7,7 @@ import exception.NotFoundException;
 import exception.PageNotFoundException;
 import exception.ServerTechnicalProblemsException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.AppointmentRecordRepository;
@@ -25,35 +26,20 @@ import util.SessionPool;
 import java.time.LocalDate;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class AppointmentRecordService {
-    private final Session session;
 
-    private final PatientRepository patientRepository;
     private final AppointmentRecordRepository appointmentRecordRepository;
-    private final DoctorRepository doctorRepository;
 
-    private final AppointmentRecordRequestConverter appointmentRecordConverter;
-    private final DoctorDtoMapper doctorDtoMapper;
-    private final AppointmentRecordMapper appointmentRecordMapper;
     private final AppointmentRecordDtoMapper appointmentRecordDtoMapper;
-
-    public AppointmentRecordService(){
-        this.session = SessionPool.getSession();
-        this.patientRepository = new PatientRepository(session);
-        this.doctorRepository = new DoctorRepository(session);
-        this.appointmentRecordRepository = new AppointmentRecordRepository(session);
-        this.appointmentRecordConverter = new AppointmentRecordRequestConverter();
-        this.doctorDtoMapper = new DoctorDtoMapper();
-        this.appointmentRecordMapper = new AppointmentRecordMapper();
-        this.appointmentRecordDtoMapper = new AppointmentRecordDtoMapper();
-    }
 
     @SneakyThrows
     public AppointmentRecordDto getAppointmentRecordDto(HttpServletRequest request){
+        Session session = SessionPool.getSession();
         Long appRecordId = extractAppointmentRecordIdFromRequest(request);
         try {
             session.beginTransaction();
-            Optional<AppointmentRecord> mayBeAppointmentRecord = appointmentRecordRepository.findById(appRecordId);
+            Optional<AppointmentRecord> mayBeAppointmentRecord = appointmentRecordRepository.findById(appRecordId, session);
             if (mayBeAppointmentRecord.isPresent()){
                 return appointmentRecordDtoMapper.mapFrom(mayBeAppointmentRecord.get());
             }else throw new PageNotFoundException();

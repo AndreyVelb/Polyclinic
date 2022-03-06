@@ -6,6 +6,7 @@ import entity.Patient;
 import exception.NotFoundException;
 import exception.ServerTechnicalProblemsException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.AppointmentRecordRepository;
@@ -15,6 +16,7 @@ import service.dto.doctor.AppointmentRecordDto;
 import service.dto.doctor.AppointmentRecordSavedDto;
 import service.dto.doctor.AppointmentRecordRequestDto;
 import service.dto.doctor.DoctorDto;
+import service.dto.validator.DtoValidator;
 import service.mapper.AppointmentRecordDtoMapper;
 import service.mapper.AppointmentRecordMapper;
 import service.mapper.DoctorDtoMapper;
@@ -24,42 +26,33 @@ import util.SessionPool;
 import java.time.LocalDate;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class AppointmentRecordCreateService {
-    private final Session session;
 
     private final PatientRepository patientRepository;
     private final AppointmentRecordRepository appointmentRecordRepository;
     private final DoctorRepository doctorRepository;
 
-    private final AppointmentRecordRequestConverter appointmentRecordConverter;
-    private final DoctorDtoMapper doctorDtoMapper;
+    private final AppointmentRecordRequestConverter appointmentRecordRequestConverter;
     private final AppointmentRecordMapper appointmentRecordMapper;
     private final AppointmentRecordDtoMapper appointmentRecordDtoMapper;
 
-    public AppointmentRecordCreateService(){
-        this.session = SessionPool.getSession();
-        this.patientRepository = new PatientRepository(session);
-        this.doctorRepository = new DoctorRepository(session);
-        this.appointmentRecordRepository = new AppointmentRecordRepository(session);
-        this.appointmentRecordConverter = new AppointmentRecordRequestConverter();
-        this.doctorDtoMapper = new DoctorDtoMapper();
-        this.appointmentRecordMapper = new AppointmentRecordMapper();
-        this.appointmentRecordDtoMapper = new AppointmentRecordDtoMapper();
-    }
+    private final DtoValidator dtoValidator;
 
     @SneakyThrows
     public AppointmentRecordDto writeAndSaveAppointmentRecord(HttpServletRequest request){
+        Session session = SessionPool.getSession();
         try {
             DoctorDto doctorDto = (DoctorDto) request.getSession().getAttribute("DOCTOR");
             session.beginTransaction();
-            Doctor doctor = doctorRepository.findById(doctorDto.getId()).get();
+            Doctor doctor = doctorRepository.findById(doctorDto.getId(), SessionPool.getSession()).get();
             Long patientId = extractPatientIdFromRequest(request);
-            Optional<Patient> mayBePatient = patientRepository.findById(patientId);
+            Optional<Patient> mayBePatient = patientRepository.findById(patientId, session);
             if (mayBePatient.isPresent()) {
                 Patient patient = mayBePatient.get();
                 AppointmentRecord appointmentRecordWithoutId = createAppointmentRecord(doctor, patient, request);
-                appointmentRecordRepository.save(appointmentRecordWithoutId);
-                Optional<AppointmentRecord> appointmentRecordWithId = appointmentRecordRepository.findByDoctorPatientAndDate(appointmentRecordWithoutId);
+                appointmentRecordRepository.save(appointmentRecordWithoutId, session);
+                Optional<AppointmentRecord> appointmentRecordWithId = appointmentRecordRepository.findByDoctorPatientAndDate(appointmentRecordWithoutId, session);
                 if (appointmentRecordWithId.isPresent()){
                     AppointmentRecordDto appointmentRecordDto = appointmentRecordDtoMapper.mapFrom(appointmentRecordWithId.get());
                     session.getTransaction().commit();
@@ -72,18 +65,18 @@ public class AppointmentRecordCreateService {
         }
     }
 
-    //ВАЛИДАЦИЯ
     @SneakyThrows
     private AppointmentRecord createAppointmentRecord(Doctor doctor, Patient patient, HttpServletRequest request){
-        AppointmentRecordRequestDto appointmentRecordRequestDto = appointmentRecordConverter.convert(request);
-        AppointmentRecordSavedDto appointmentRecordDto = AppointmentRecordSavedDto.builder()
+        AppointmentRecordRequestDto appointmentRecordRequestDto = appointmentRecordRequestConverter.convert(request);
+        AppointmentRecordSavedDto appointmentRecordSavedDto = AppointmentRecordSavedDto.builder()
                 .doctor(doctor)
                 .patient(patient)
                 .visitDate(LocalDate.now())
                 .healthComplaints(appointmentRecordRequestDto.getHealthComplaints())
                 .doctorsRecommendation(appointmentRecordRequestDto.getDoctorsRecommendation())
                 .build();
-        return appointmentRecordMapper.mapFrom(appointmentRecordDto);
+        dtoValidator.isValid(appointmentRecordSavedDto);
+        return appointmentRecordMapper.mapFrom(appointmentRecordSavedDto);
     }
 
     private Long extractPatientIdFromRequest(HttpServletRequest request){
