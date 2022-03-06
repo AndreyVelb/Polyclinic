@@ -1,10 +1,11 @@
 package service.dto;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Builder
-@Value
 public class PatientFindByLastNameDto {
 
     String lastName;

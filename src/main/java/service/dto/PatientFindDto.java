@@ -1,12 +1,13 @@
 package service.dto;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
 import java.time.LocalDate;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Builder
-@Value
 public class PatientFindDto {
 
     String lastName;

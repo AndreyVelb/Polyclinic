@@ -7,10 +7,10 @@ import org.hibernate.Session;
 import repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
 import servlet.converter.request.DoctorLoginConverter;
-import service.mapper.to.DoctorDtoMapper;
+import service.mapper.DoctorDtoMapper;
 import service.dto.doctor.DoctorLoginDto;
 import service.dto.doctor.DoctorDto;
-import service.mapper.util.SessionPool;
+import util.SessionPool;
 
 import java.util.Optional;
 
@@ -22,14 +22,6 @@ public class DoctorLoginService {
 
     private final DoctorLoginConverter doctorLoginConverter;
     private final DoctorDtoMapper doctorDtoMapper;
-
-//    private final AppointmentRecordNewDBRepository appointmentRecordNewDBRepository;
-//    private final AppointmentRecordOldDBRepository appointmentRecordOldDBRepository;
-//    private final PatientOldDBRepository patientOldDBRepository;
-//
-//    private final DoctorRegistrationMapper doctorRegistrationMapper;
-//    private final PatientFromOldDBToNewDBMapper patientFromOldDBToNewDBMapper;
-//    private final ApRecordFromOldDBToNewDBMapper apRecordFromOldDBToNewDBMapper;
 
     public DoctorLoginService(){
         this.session = SessionPool.getSession();

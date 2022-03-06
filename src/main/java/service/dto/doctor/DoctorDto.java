@@ -23,6 +23,4 @@ public class DoctorDto implements Dto {
 
     DoctorSpeciality speciality;
 
-    String login;
-
 }

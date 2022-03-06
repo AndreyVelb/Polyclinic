@@ -8,7 +8,7 @@ import org.hibernate.cfg.Configuration;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import service.mapper.util.HibernateUtil;
+import util.HibernateUtil;
 
 @Testcontainers
 public class HibernateTestUtil {

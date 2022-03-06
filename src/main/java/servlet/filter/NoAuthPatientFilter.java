@@ -4,7 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.mapper.util.UrlPath;
+import util.UrlPath;
 
 import java.io.IOException;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class NoAuthPatientFilter extends AbstractFilter {
         if (!isPatientLoggedIn(httpRequest) && isRightPath(requestUri, NO_AUTH_PATIENTS_PATHS)){
             chain.doFilter(httpRequest, httpResponse);
         }else {
-            httpResponse.sendRedirect(UrlPath.DOCTOR_LOGOUT);
+            httpResponse.sendRedirect(UrlPath.PATIENT_LOGOUT);
         }
     }
 

@@ -1,9 +1,7 @@
 package servlet.performer;
 
 import jakarta.servlet.http.HttpServletRequest;
-import servlet.performer.doctor.DoctorLoginPerformer;
-import servlet.performer.doctor.PatientPagePerformer;
-import servlet.performer.doctor.PatientSearcherPerformer;
+import servlet.performer.doctor.*;
 import servlet.performer.patient.PatientLoginPerformer;
 import servlet.performer.patient.PatientRegistrationPerformer;
 
@@ -15,8 +13,11 @@ public class PerformerDispatcher {
     private static final PatientRegistrationPerformer patientRegistrationPerformer = new PatientRegistrationPerformer();
     private static final PatientLoginPerformer patientLoginPerformer = new PatientLoginPerformer();
     private static final DoctorLoginPerformer doctorLoginPerformer = new DoctorLoginPerformer();
-    private static final PatientSearcherPerformer patientSearcherPerformer = new PatientSearcherPerformer();
-    private static final PatientPagePerformer patientPagePerformer = new PatientPagePerformer();
+    private static final SearchPatientPerformer searchPatientPerformer = new SearchPatientPerformer();
+    private static final MedicCardPerformer medicCardPerformer = new MedicCardPerformer();
+    private static final AppointmentRecordCreatePerformer appointmentRecordCreatePerformer = new AppointmentRecordCreatePerformer();
+    public static final AppointmentRecordPerformer appointmentRecordPerformer = new AppointmentRecordPerformer();
+    private static final PatientsRecordsPerformer patientsRecordsPerformer = new PatientsRecordsPerformer();
 
     public PerformerDispatcher(){
         allPerformers = createPerformerList();
@@ -36,8 +37,11 @@ public class PerformerDispatcher {
         performerList.add(patientRegistrationPerformer);
         performerList.add(doctorLoginPerformer);
         performerList.add(patientLoginPerformer);
-        performerList.add(patientSearcherPerformer);
-        performerList.add(patientPagePerformer);
+        performerList.add(searchPatientPerformer);
+        performerList.add(medicCardPerformer);
+        performerList.add(appointmentRecordCreatePerformer);
+        performerList.add(appointmentRecordPerformer);
+        performerList.add(patientsRecordsPerformer);
 
         return performerList;
     }

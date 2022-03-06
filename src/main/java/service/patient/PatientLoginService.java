@@ -6,10 +6,10 @@ import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.PatientRepository;
 import servlet.converter.request.PatientLoginConverter;
-import service.mapper.to.PatientDtoMapper;
+import service.mapper.PatientDtoMapper;
 import service.dto.patient.PatientDto;
 import service.dto.patient.PatientLoginDto;
-import service.mapper.util.SessionPool;
+import util.SessionPool;
 
 import java.util.Optional;
 

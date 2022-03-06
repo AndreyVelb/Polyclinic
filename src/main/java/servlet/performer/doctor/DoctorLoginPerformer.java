@@ -8,8 +8,8 @@ import service.doctor.DoctorLoginService;
 import exception.NotAuthenticatedException;
 import service.dto.doctor.DoctorDto;
 import servlet.performer.Performer;
-import service.mapper.util.HttpMethod;
-import service.mapper.util.UrlPath;
+import util.HttpMethod;
+import util.UrlPath;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class DoctorLoginPerformer implements Performer {
                 session.setAttribute("DOCTOR", doctorDto);
 //                request.getSession().setAttribute("DOCTOR", doctorDto);
             }
-            response.sendRedirect(UrlPath.DOCTOR_SEARCH_PATIENT);
+            response.sendRedirect(UrlPath.DOCTOR_PATH_WITHOUT_INFO);
         }else {
             throw new NotAuthenticatedException();
         }

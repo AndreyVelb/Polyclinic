@@ -4,11 +4,10 @@ import exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
-import service.mapper.util.HttpMethod;
-import service.mapper.util.UrlPath;
+import util.HttpMethod;
+import util.UrlPath;
 import servlet.performer.Performer;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 

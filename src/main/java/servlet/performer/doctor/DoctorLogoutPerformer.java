@@ -5,10 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import servlet.performer.Performer;
-import service.mapper.util.HttpMethod;
-import service.mapper.util.UrlPath;
+import util.HttpMethod;
+import util.UrlPath;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 

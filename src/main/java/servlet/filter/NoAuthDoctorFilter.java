@@ -4,7 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.mapper.util.UrlPath;
+import util.UrlPath;
 
 import java.io.IOException;
 import java.util.Set;

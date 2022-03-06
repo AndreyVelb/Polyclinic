@@ -7,8 +7,8 @@ import lombok.SneakyThrows;
 import service.patient.PatientLoginService;
 import service.dto.patient.PatientDto;
 import servlet.performer.Performer;
-import service.mapper.util.HttpMethod;
-import service.mapper.util.UrlPath;
+import util.HttpMethod;
+import util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;

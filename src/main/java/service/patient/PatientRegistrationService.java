@@ -4,7 +4,7 @@ import exception.ServerTechnicalProblemsException;
 import lombok.SneakyThrows;
 import exception.AlreadyExistsException;
 import exception.DtoValidationException;
-import service.mapper.to.PatientDtoMapper;
+import service.mapper.PatientDtoMapper;
 import servlet.response.PatientRegistrationResponse;
 import service.dto.patient.PatientDto;
 import service.dto.patient.PatientRegistrationDto;
@@ -14,10 +14,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
 import org.hibernate.annotations.DynamicInsert;
 import repository.PatientRepository;
-import service.mapper.from.dto.RegistrationPatientMapper;
+import service.mapper.PatientMapper;
 import servlet.converter.request.RegistrationPatientConverter;
 import service.dto.validator.DtoValidator;
-import service.mapper.util.SessionPool;
+import util.SessionPool;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -31,7 +31,7 @@ public class PatientRegistrationService {
     private final PatientRepository patientNewDBRepository;
 
     private final RegistrationPatientConverter registrationPatientConverter;
-    private final RegistrationPatientMapper registrationPatientMapper;
+    private final PatientMapper registrationPatientMapper;
     private final PatientDtoMapper patientDtoMapper;
 
     private final DtoValidator dtoValidator;
@@ -40,7 +40,7 @@ public class PatientRegistrationService {
         this.session = SessionPool.getSession();
         this.patientNewDBRepository = new PatientRepository(session);
         this.registrationPatientConverter = new RegistrationPatientConverter();
-        this.registrationPatientMapper = new RegistrationPatientMapper();
+        this.registrationPatientMapper = new PatientMapper();
         this.dtoValidator = new DtoValidator();
         this.patientDtoMapper = new PatientDtoMapper();
     }

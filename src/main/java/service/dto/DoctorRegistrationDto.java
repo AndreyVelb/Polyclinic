@@ -2,15 +2,16 @@ package service.dto;
 
 import entity.DoctorSpeciality;
 import entity.Qualification;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 import service.dto.validator.DoctorMiddleNameConstraint;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-@Value
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Builder
 public class DoctorRegistrationDto {
 

@@ -7,6 +7,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import repository.AppointmentRecordRepository;
+import repository.DoctorRepository;
+import repository.PatientRepository;
+import service.doctor.AppointmentRecordCreateService;
+import service.doctor.AppointmentRecordService;
+import service.doctor.DoctorLoginService;
 import servlet.response.ExceptionResponse;
 import servlet.performer.Performer;
 import servlet.performer.PerformerDispatcher;
@@ -19,6 +25,14 @@ import static jakarta.servlet.http.HttpServletResponse.*;
 
 @WebServlet("/*")
 public class MainServlet extends HttpServlet {
+    private AppointmentRecordRepository appointmentRecordRepository;
+    private DoctorRepository doctorRepository;
+    private PatientRepository patientRepository;
+
+    private AppointmentRecordCreateService appointmentRecordCreateService;
+    private AppointmentRecordService appointmentRecordService;
+    private DoctorLoginService doctorLoginService;
+
     private static PerformerDispatcher performerDispatcher;
 
     @Override
@@ -39,6 +53,8 @@ public class MainServlet extends HttpServlet {
                 } else {
                     throw new MethodNotAllowedException();
                 }
+            }else {
+                throw new PageNotFoundException();
             }
         } catch (MethodNotAllowedException exception){
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_METHOD_NOT_ALLOWED);
@@ -66,7 +82,9 @@ public class MainServlet extends HttpServlet {
                 } else{
                     throw new MethodNotAllowedException();
                 }
-            } else throw  new PageNotFoundException();
+            } else {
+                throw  new PageNotFoundException();
+            }
         }catch (MethodNotAllowedException exception){
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_METHOD_NOT_ALLOWED);
         }catch (PageNotFoundException exception){

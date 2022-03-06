@@ -24,6 +24,4 @@ public class PatientDto implements Dto {
 
     @JsonSerialize(using = LocalDateSerializer.class)
     LocalDate birthDate;
-
-    String login;
 }

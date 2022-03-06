@@ -4,14 +4,14 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.mapper.util.UrlPath;
+import util.UrlPath;
 
 import java.io.IOException;
 import java.util.Set;
 
-@WebFilter({UrlPath.DOCTOR_LOGOUT, UrlPath.DOCTOR_SEARCH_PATIENT, UrlPath.DOCTOR_CHOOSE_PATIENT})
+@WebFilter({UrlPath.DOCTOR_LOGOUT, UrlPath.DOCTOR_PATH_WITHOUT_INFO, UrlPath.DOCTOR_PATH_WITH_INFO})
 public class AuthenticatedDoctorFilter extends AbstractFilter {
-    public static final Set<String> AUTH_DOCTORS_PATHS = Set.of(UrlPath.DOCTOR_LOGOUT, UrlPath.DOCTOR_SEARCH_PATIENT, UrlPath.DOCTOR_CHOOSE_PATIENT);
+    public static final Set<String> AUTH_DOCTORS_PATHS = Set.of(UrlPath.DOCTOR_LOGOUT, UrlPath.DOCTOR_PATH_WITHOUT_INFO, UrlPath.DOCTOR_PATH_WITH_INFO);
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
