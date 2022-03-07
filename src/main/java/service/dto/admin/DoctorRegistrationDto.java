@@ -1,4 +1,4 @@
-package service.dto;
+package service.dto.admin;
 
 import entity.DoctorSpeciality;
 import entity.Qualification;

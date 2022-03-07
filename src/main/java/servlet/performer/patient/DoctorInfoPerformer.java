@@ -1,17 +1,17 @@
-package servlet.performer.doctor;
+package servlet.performer.patient;
 
-import entity.AppointmentRecord;
 import exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import service.doctor.AppointmentRecordCreateService;
-import service.doctor.AppointmentRecordService;
-import service.dto.doctor.AppointmentRecordDto;
-import servlet.converter.response.AppointmentRecordConverter;
+import org.hibernate.hql.internal.ast.ParseErrorHandler;
+import service.dto.doctor.DoctorDto;
+import service.patient.DoctorChoiceService;
+import service.patient.DoctorInfoService;
+import servlet.converter.response.DoctorDtoConverter;
+import servlet.converter.response.DoctorDtoListConverter;
 import servlet.performer.Performer;
-import servlet.response.AppointmentRecordCreateResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
@@ -21,22 +21,17 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Set;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
-/**
- *      /doctor/{id}/patients/{id}/records/{id}
- */
-
 @RequiredArgsConstructor
-public class AppointmentRecordPerformer implements Performer {
-    private static final String path = UrlPath.DOCTOR_PATH;
-    private static final String patientsSubPath = UrlPath.DOCTOR_SUBPATH_PATIENTS;
-    private static final String recordsSubPath = UrlPath.DOCTOR_SUBPATH_ALL_PATIENTS_RECORDS;
+public class DoctorInfoPerformer implements Performer {
+    private static final String path = UrlPath.PATIENT_CHOOSE_DOCTOR;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
-    private final AppointmentRecordService service;
-    private final AppointmentRecordConverter appointmentRecordConverter;
+    private final DoctorInfoService service;
+
+    private final DoctorDtoConverter doctorDtoConverter;
+
 
     @Override
     @SneakyThrows
@@ -48,9 +43,9 @@ public class AppointmentRecordPerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        AppointmentRecordDto appointmentRecordDto = service.getAppointmentRecordDto(request);
-        String json = appointmentRecordConverter.convert(appointmentRecordDto);
-        new JsonResponse().send(writer, response, json, SC_OK);
+        DoctorDto doctorDto = service.getDoctorDto(request);
+        String doctorDtoAsJson = doctorDtoConverter.convert(doctorDto);
+//        new JsonResponse().send(writer, response, json, SC_OK);
     }
 
     @Override
@@ -67,13 +62,7 @@ public class AppointmentRecordPerformer implements Performer {
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
-            String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 7
-                    && requestPathParts[2].matches("[1-90]+")
-                    && requestPathParts[3].matches(patientsSubPath)
-                    && requestPathParts[4].matches("[1-90]+")
-                    && requestPathParts[5].matches(recordsSubPath)
-                    && requestPathParts[6].matches("[1-90]+")){  // 0-""/ 1-"doctor"/ 2-"{some_id}"/ 3-"patients"/ 4-"{some id}"/ 5-"records"/ 6-"{some id}"
+            if (request.getPathInfo().split("/").length == 3){      // 0-""/ 1-"patient"/ 2-"doctors"
                 return true;
             }else return false;
         }else return false;

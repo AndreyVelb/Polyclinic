@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.dto.patient.PatientDto;
 import util.UrlPath;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @WebFilter({UrlPath.PATIENT_LOGOUT})
 public class AuthenticatedPatientFilter extends AbstractFilter{
-    public static final Set<String> AUTH_PATIENTS_PATHS = Set.of(UrlPath.PATIENT_LOGOUT);
+    private static final Set<String> AUTH_PATIENTS_PATHS = Set.of(UrlPath.PATIENT_LOGOUT);
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
@@ -25,5 +26,10 @@ public class AuthenticatedPatientFilter extends AbstractFilter{
         }else {
             httpResponse.sendRedirect(UrlPath.PATIENT_LOGIN);
         }
+    }
+
+    private boolean isPatientLoggedIn(HttpServletRequest httpRequest){
+        PatientDto patientDto = (PatientDto) httpRequest.getSession().getAttribute("PATIENT");
+        return patientDto != null;
     }
 }

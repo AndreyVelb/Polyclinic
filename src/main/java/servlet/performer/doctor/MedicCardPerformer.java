@@ -23,9 +23,14 @@ import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+/**
+ *      /doctor/{id}/patients/{id}
+ */
+
 @RequiredArgsConstructor
 public class MedicCardPerformer implements Performer {
-    private static final String path = UrlPath.DOCTOR_PATH_WITHOUT_INFO;
+    private static final String path = UrlPath.DOCTOR_PATH;
+    private static final String patientsSubPath = UrlPath.DOCTOR_SUBPATH_PATIENTS;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
     private final MedicCardService service;
@@ -65,7 +70,10 @@ public class MedicCardPerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 4 && requestPathParts[3].matches("[1-90]+")){  // 0-""/ 1-"doctor"/ 2-"patients"/ 3-"{some id}"
+            if(requestPathParts.length == 5
+                    && requestPathParts[2].matches("[1-90]+")
+                    && requestPathParts[3].matches(patientsSubPath)
+                    && requestPathParts[4].matches("[1-90]+")){  // 0-""/ 1-"doctor"/ 2-"{some id}"/ 3-"patients"/ 4-"{some id}"
                 return true;
             }else return false;
         }else return false;

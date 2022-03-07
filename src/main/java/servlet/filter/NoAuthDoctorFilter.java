@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.dto.doctor.DoctorDto;
 import util.UrlPath;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @WebFilter({UrlPath.DOCTOR_LOGIN})
 public class NoAuthDoctorFilter extends AbstractFilter{
-    public static final Set<String> NO_AUTH_DOCTORS_PATHS = Set.of(UrlPath.DOCTOR_LOGIN);
+    private static final Set<String> NO_AUTH_DOCTORS_PATHS = Set.of(UrlPath.DOCTOR_LOGIN);
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws ServletException, IOException {
@@ -27,4 +28,8 @@ public class NoAuthDoctorFilter extends AbstractFilter{
         }
     }
 
+    private boolean isDoctorLoggedIn(HttpServletRequest httpRequest){
+        DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute("DOCTOR");
+        return doctorDto != null;
+    }
 }

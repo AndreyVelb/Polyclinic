@@ -1,42 +1,38 @@
-package servlet.performer.doctor;
+package servlet.performer.admin;
 
-import entity.AppointmentRecord;
 import exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import service.doctor.AppointmentRecordCreateService;
-import service.doctor.AppointmentRecordService;
-import service.dto.doctor.AppointmentRecordDto;
-import servlet.converter.response.AppointmentRecordConverter;
+import repository.DoctorRepository;
+import repository.PatientRepository;
+import service.admin.HomePageService;
+import service.dto.admin.AdminStatisticsDto;
+import servlet.converter.response.AdminStatisticsDtoConverter;
 import servlet.performer.Performer;
-import servlet.response.AppointmentRecordCreateResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
-import static jakarta.servlet.http.HttpServletResponse.SC_OK;
-
-/**
- *      /doctor/{id}/patients/{id}/records/{id}
- */
 
 @RequiredArgsConstructor
-public class AppointmentRecordPerformer implements Performer {
-    private static final String path = UrlPath.DOCTOR_PATH;
-    private static final String patientsSubPath = UrlPath.DOCTOR_SUBPATH_PATIENTS;
-    private static final String recordsSubPath = UrlPath.DOCTOR_SUBPATH_ALL_PATIENTS_RECORDS;
+public class HomePagePerformer implements Performer {
+    private static final String path = UrlPath.ADMIN_PATH;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
-    private final AppointmentRecordService service;
-    private final AppointmentRecordConverter appointmentRecordConverter;
+    private final HomePageService service;
+
+    private final PatientRepository patientRepository;
+    private final DoctorRepository doctorRepository;
+
+    private final AdminStatisticsDtoConverter adminStatisticsDtoConverter;
+
 
     @Override
     @SneakyThrows
@@ -48,9 +44,14 @@ public class AppointmentRecordPerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        AppointmentRecordDto appointmentRecordDto = service.getAppointmentRecordDto(request);
-        String json = appointmentRecordConverter.convert(appointmentRecordDto);
-        new JsonResponse().send(writer, response, json, SC_OK);
+        int patientCount = service.getNumbersOfSubjects(patientRepository);
+        int doctorCount = service.getNumbersOfSubjects(doctorRepository);
+        AdminStatisticsDto adminStatisticsDto = AdminStatisticsDto.builder()
+                .patientCount(patientCount)
+                .doctorCount(doctorCount)
+                .build();
+        String jsonStatistics = adminStatisticsDtoConverter.convert(adminStatisticsDto);
+        new JsonResponse().send(writer, response, jsonStatistics, SC_CREATED);
     }
 
     @Override
@@ -68,12 +69,7 @@ public class AppointmentRecordPerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 7
-                    && requestPathParts[2].matches("[1-90]+")
-                    && requestPathParts[3].matches(patientsSubPath)
-                    && requestPathParts[4].matches("[1-90]+")
-                    && requestPathParts[5].matches(recordsSubPath)
-                    && requestPathParts[6].matches("[1-90]+")){  // 0-""/ 1-"doctor"/ 2-"{some_id}"/ 3-"patients"/ 4-"{some id}"/ 5-"records"/ 6-"{some id}"
+            if(requestPathParts.length == 3 && requestPathParts[2].matches("[1-90]+")){  // 0-""/ 1-"admin"/ 2-"{some id}"
                 return true;
             }else return false;
         }else return false;

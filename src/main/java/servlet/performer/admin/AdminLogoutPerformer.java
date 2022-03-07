@@ -1,26 +1,21 @@
-package servlet.performer.doctor;
+package servlet.performer.admin;
 
-import exception.*;
+import exception.MethodNotAllowedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jdk.jfr.Registered;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import servlet.performer.Performer;
 import util.HttpMethod;
 import util.UrlPath;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Set;
 
-/**
- *      /doctor/{id}/logout
- */
-
-@Registered
-public class DoctorLogoutPerformer implements Performer{
-    private static final String path = UrlPath.DOCTOR_PATH;
-    private static final String logoutSubPath = UrlPath.DOCTOR_SUBPATH_LOGOUT;
+@RequiredArgsConstructor
+public class AdminLogoutPerformer implements Performer {
+    private static final String path = UrlPath.ADMIN_PATH;
+    private static final String logoutSubPath = UrlPath.ADMIN_SUBPATH_LOGOUT;
     private static final Set<String> performableMethods = Set.of(HttpMethod.POST);
 
     @Override
@@ -52,9 +47,7 @@ public class DoctorLogoutPerformer implements Performer{
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 4
-                    && requestPathParts[2].matches("[1-90]+")
-                    && requestPathParts[3].matches(logoutSubPath)){     // 0-""/ 1-"doctor"/ 2-"{some_id}"/ 3-"logout"
+            if(requestPathParts.length == 4 && requestPathParts[3].matches(logoutSubPath)){  // 0-""/ 1-"admin"/ 2-"{some id}"/ 3-"logout"
                 return true;
             }else return false;
         }else return false;

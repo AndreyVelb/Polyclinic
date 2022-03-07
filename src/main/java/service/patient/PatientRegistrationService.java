@@ -36,18 +36,25 @@ public class PatientRegistrationService {
     private final DtoValidator dtoValidator;
 
     @SneakyThrows
-    public void registration(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws AlreadyExistsException, IOException, ServerTechnicalProblemsException, DtoValidationException {
+    public PatientDto registration(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws AlreadyExistsException, IOException, ServerTechnicalProblemsException, DtoValidationException {
         Session session = SessionPool.getSession();
-        PatientRegistrationResponse registrationResponse = new PatientRegistrationResponse();
         Patient patient = createPatient(request);
+        try {
+            session.beginTransaction();
+            if(patientRepository.registerPatient(patient, session)){
+                Patient registeredPatient = patientRepository.findByLogin(patient.getLogin(), session).get();
+                session.getTransaction().commit();
+                return patientDtoMapper.mapFrom(registeredPatient);
 
-        session.beginTransaction();
-        if(patientRepository.registerPatient(patient, session)){
-            Patient registeredPatient = patientRepository.findByLogin(patient.getLogin(), session).get();
-            PatientDto patientDto = patientDtoMapper.mapFrom(registeredPatient);
-            session.getTransaction().commit();
-            registrationResponse.send(response.getWriter(), response, patientDto, SC_CREATED);
-        } else throw new AlreadyExistsException();
+                registrationResponse.send(response.getWriter(), response, patientDto, SC_CREATED);
+            }
+        }catch (Exception exception){
+            session.getTransaction().rollback();
+            throw exception;
+        }
+
+
+             else throw new AlreadyExistsException();
     }
 
     private Patient createPatient(HttpServletRequest request) throws IOException, DtoValidationException {

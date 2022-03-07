@@ -1,8 +1,7 @@
 package service.mapper;
 
-import service.dto.DoctorRegistrationDto;
+import service.dto.admin.DoctorRegistrationDto;
 import entity.Doctor;
-import service.mapper.Mapper;
 
 public class DoctorRegistrationMapper implements Mapper<DoctorRegistrationDto, Doctor> {
 

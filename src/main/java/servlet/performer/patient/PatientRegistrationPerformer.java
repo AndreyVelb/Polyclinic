@@ -4,14 +4,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import service.dto.patient.PatientDto;
 import service.patient.PatientRegistrationService;
 import servlet.performer.Performer;
+import servlet.response.PatientRegistrationResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Set;
+
+import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 
 @RequiredArgsConstructor
 public class PatientRegistrationPerformer implements Performer {
@@ -23,7 +27,8 @@ public class PatientRegistrationPerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        service.registration(writer, request, response);
+        PatientDto patientDto = service.registration(writer, request, response);
+        new PatientRegistrationResponse().send(response.getWriter(), response, patientDto, SC_CREATED);
     }
 
     @Override

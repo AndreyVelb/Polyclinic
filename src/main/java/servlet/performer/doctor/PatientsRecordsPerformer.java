@@ -21,10 +21,15 @@ import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+/**
+ *      /doctor/{id}/patients/{id}/records
+ */
+
 @RequiredArgsConstructor
 public class PatientsRecordsPerformer implements Performer {
-    private static final String path = UrlPath.DOCTOR_PATH_WITHOUT_INFO;
-    private static final String subPath = "records";
+    private static final String path = UrlPath.DOCTOR_PATH;
+    private static final String patientsSubPath = UrlPath.DOCTOR_SUBPATH_PATIENTS;
+    private static final String recordsSubPath = UrlPath.DOCTOR_SUBPATH_ALL_PATIENTS_RECORDS;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
     private final PatientsRecordsService service;
@@ -61,7 +66,11 @@ public class PatientsRecordsPerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 5 && requestPathParts[4].matches(subPath)){  // 0-""/ 1-"doctor"/ 2-"patients"/ 3-"{some id}"/ 4-"records"
+            if(requestPathParts.length == 6
+                    && requestPathParts[2].matches("[1-90]+")
+                    && requestPathParts[3].matches(patientsSubPath)
+                    && requestPathParts[4].matches("[1-90]+")
+                    && requestPathParts[5].matches(recordsSubPath)){  // 0-""/ 1-"doctor"/ 2-"{some_id}"/ 3-"patients"/ 4-"{some id}"/ 5-"records"
                 return true;
             }else return false;
         }else return false;

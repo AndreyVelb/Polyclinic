@@ -1,18 +1,25 @@
+//import entity.Doctor;
+//import entity.DoctorSpeciality;
+//import entity.Qualification;
+//import org.hibernate.Session;
+//import repository.DoctorRepository;
+//import util.SessionPool;
+//
 //public class Main {
 //    public static void main(String[] args) {
-//        Session session = NewDBSessionPool.getSession();
-//        DoctorNewDBRepository doctorNewDBRepository = new DoctorNewDBRepository(session);
-//        DoctorNewDB doctorNewDB = DoctorNewDB.builder()
-//                .lastName("Иванов")
-//                .firstName("Иван")
-//                .middleName("Иванович")
-//                .speciality(DoctorSpeciality.SURGEON)
+//        Session session = SessionPool.getSession();
+//        DoctorRepository doctorNewDBRepository = new DoctorRepository();
+//        Doctor doctorNewDB = Doctor.builder()
+//                .lastName("Админ")
+//                .firstName("Админ")
+//                .middleName("Админ")
+//                .speciality(DoctorSpeciality.CHIEF_DOCTOR)
 //                .qualification(Qualification.FIRST)
-//                .login("ivanov")
-//                .password("ivanov")
+//                .login("admin")
+//                .password("admin")
 //                .build();
 //        session.beginTransaction();
-//        doctorNewDBRepository.save(doctorNewDB);
+//        doctorNewDBRepository.save(doctorNewDB, session);
 //        session.getTransaction().commit();
 
 //    }
@@ -24,7 +31,7 @@
 //            Session newDBSession = (Session) Proxy.newProxyInstance(SessionFactory.class.getClassLoader(), new Class[]{Session.class}, (proxy, method, args1)
 //                    -> method.invoke(newDBSessionFactory.getCurrentSession(), args1));
 //
-
+//
 //            PatientNewDBRepository patientNewDBRepository = new PatientNewDBRepository(newDBSession);
 //            AppointmentRecordNewDBRepository appointmentRecordNewDBRepository = new AppointmentRecordNewDBRepository(newDBSession);
 //            AppointmentRecordOldDBRepository appointmentRecordOldDBRepository = new AppointmentRecordOldDBRepository(oldDBSession);
@@ -62,11 +69,9 @@
 //                    .build();
 //
 //            doctorService.savePatientAndHisRecordsFromOldDBInNewDB(patientOldDB);
-//
-////        if (doctorNewDBRepository.authentication("Petrov", "petrov")){
-////            System.out.println("TRUE");
-////        }else System.out.println("FALSE");
-//        }
 
-//    }
+//        if (doctorNewDBRepository.authentication("Petrov", "petrov")){
+//            System.out.println("TRUE");
+//        }else System.out.println("FALSE");
+//        }
 //}

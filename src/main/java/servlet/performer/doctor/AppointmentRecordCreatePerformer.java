@@ -14,16 +14,19 @@ import util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 
+/**
+ *      /doctor/{id}/patients/{id}/writing-record
+ */
+
 @RequiredArgsConstructor
 public class AppointmentRecordCreatePerformer implements Performer {
-    private static final String path = UrlPath.DOCTOR_PATH_WITHOUT_INFO;
-    private static final String subPath = "writing-record";
+    private static final String path = UrlPath.DOCTOR_PATH;
+    private static final String patientsSubPath = UrlPath.DOCTOR_SUBPATH_PATIENTS;
+    private static final String writingRecordSubPath = UrlPath.DOCTOR_SUBPATH_WRITING_RECORD;
     private static final Set<String> performableMethods = Set.of(HttpMethod.POST);
 
     private final AppointmentRecordCreateService service;
@@ -58,7 +61,11 @@ public class AppointmentRecordCreatePerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 5 && requestPathParts[4].matches(subPath)){  // 0-""/ 1-"doctor"/ 2-"patients"/ 3-"{some id}"/ 4-"writing-record
+            if(requestPathParts.length == 6
+                    && requestPathParts[2].matches("[1-90]+")
+                    && requestPathParts[3].matches(patientsSubPath)
+                    && requestPathParts[4].matches("[1-90]+")
+                    && requestPathParts[5].matches(writingRecordSubPath)){  // 0-""/ 1-"doctor"/ 2-"{some id}"/ 3-"patients"/ 4-"{some id}"/ 5-"writing-record"
                 return true;
             }else return false;
         }else return false;

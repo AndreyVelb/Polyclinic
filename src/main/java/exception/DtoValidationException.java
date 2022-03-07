@@ -10,7 +10,7 @@ public class DtoValidationException extends Exception{
         StringBuffer buffer = new StringBuffer();
         buffer.append("При вводе информации были допущены следующие ошибки: \n");
         for (ConstraintViolation<?> violation : violationException.getConstraintViolations()) {
-            buffer.append(violation + "\n");
+            buffer.append(violation.getMessage() + "\n");
         }
         this.message = buffer.toString();
     }
