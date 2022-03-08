@@ -1,10 +1,10 @@
 package repository;
 
-import entity.DoctorsWorkSchedule;
+import entity.WorkSchedule;
 
-public class DoctorsWorkScheduleRepository extends AbstractRepository<Long, DoctorsWorkSchedule>{
+public class DoctorsWorkScheduleRepository extends AbstractRepository<Long, WorkSchedule>{
 
-    public DoctorsWorkScheduleRepository(Class<DoctorsWorkSchedule> clazz) {
+    public DoctorsWorkScheduleRepository(Class<WorkSchedule> clazz) {
         super(clazz);
     }
 }

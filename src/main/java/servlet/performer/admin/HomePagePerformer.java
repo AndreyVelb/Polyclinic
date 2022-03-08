@@ -21,6 +21,10 @@ import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 
+/**
+ *      /admin/{id}
+ */
+
 @RequiredArgsConstructor
 public class HomePagePerformer implements Performer {
     private static final String path = UrlPath.ADMIN_PATH;

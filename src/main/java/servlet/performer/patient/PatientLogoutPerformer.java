@@ -13,9 +13,14 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Set;
 
+/**
+ *      /patient/{id}/logout
+ */
+
 @RequiredArgsConstructor
 public class PatientLogoutPerformer implements Performer {
-    private static final String path = UrlPath.PATIENT_LOGOUT;
+    private static final String path = UrlPath.PATIENT_PATH;
+    private static final String logoutSubPath = UrlPath.PATIENT_SUBPATH_LOGOUT;
     private static final Set<String> performableMethods = Set.of(HttpMethod.POST);
 
     @Override
@@ -45,6 +50,11 @@ public class PatientLogoutPerformer implements Performer {
     @Override
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
-        return path.equals(requestPath);
+        if(requestPath.startsWith(path)){
+            String[] requestPathParts = request.getPathInfo().split("/");
+            return requestPathParts.length == 4
+                    && requestPathParts[2].matches("[1-90]+")
+                    && requestPathParts[3].matches(logoutSubPath);      // 0-""/ 1-"patient"/ 2-{id}/ 3-"logout"
+        }else return false;
     }
 }

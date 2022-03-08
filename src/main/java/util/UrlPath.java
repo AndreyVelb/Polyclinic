@@ -8,10 +8,9 @@ public class UrlPath {
     public static final String ADMIN_PATH = "admin";
     public static final String ADMIN_SUBPATH_LOGOUT = "logout";
     public static final String ADMIN_SUBPATH_DOC_REGISTRATION = "doc-registration";
-    public static final String ADMIN_SUBPATH_DOCTORS = "doctors";
-    public static final String ADMIN_SUBPATH_CHANGE_DOCTORS_SCHEDULE = "change-schedule";
-
-    public static final String ADMIN_CREATE_SCHEDULE_ON_WEEK = "admin/schedule";
+//    public static final String ADMIN_SUBPATH_DOCTORS = "doctors";
+//    public static final String ADMIN_SUBPATH_CHANGE_DOCTORS_SCHEDULE = "change-schedule";
+    public static final String ADMIN_CREATE_SCHEDULE_ON_WEEK = "admin/next_week-schedule";
 
 
     public static final String DOCTOR_LOGIN = "/doctor/login";
@@ -26,12 +25,6 @@ public class UrlPath {
     public static final String PATIENT_LOGIN = "/patient/login";
     public static final String PATIENT_PATH = "patient";
     public static final String PATIENT_SUBPATH_LOGOUT = "logout";
-    public static final String PATIENT_SUBPATH_CHOOSE_DOCTOR = "doctors";
-
-
-
-
-
-
+    public static final String PATIENT_SUBPATH_DOCTORS = "doctors";
 
 }

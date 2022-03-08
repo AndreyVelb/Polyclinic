@@ -1,5 +1,6 @@
 package service.admin;
 
+import entity.Doctor;
 import entity.Patient;
 import exception.AlreadyExistsException;
 import exception.DtoValidationException;
@@ -10,13 +11,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.DoctorRepository;
+import service.dto.admin.DoctorRegistrationDto;
+import service.dto.doctor.DoctorDto;
 import service.dto.patient.PatientDto;
 import service.dto.patient.PatientRegistrationDto;
 import service.dto.validator.DtoValidator;
+import service.mapper.DoctorDtoMapper;
+import service.mapper.DoctorMapper;
 import service.mapper.PatientDtoMapper;
+import servlet.converter.request.RegistrationDoctorConverter;
 import servlet.response.PatientRegistrationResponse;
 import util.SessionPool;
 
+import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -28,31 +35,36 @@ public class DoctorRegistrationService {
 
     private final RegistrationDoctorConverter registrationDoctorConverter;
     private final DoctorMapper doctorMapper;
-    private final PatientDtoMapper doctorDtoMapper;
+    private final DoctorDtoMapper doctorDtoMapper;
 
     private final DtoValidator dtoValidator;
 
     @SneakyThrows
-    public void registration(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws AlreadyExistsException, IOException, ServerTechnicalProblemsException, DtoValidationException {
+    public DoctorDto registration(HttpServletRequest request) {
         Session session = SessionPool.getSession();
-        PatientRegistrationResponse registrationResponse = new PatientRegistrationResponse();
-        Patient patient = createPatient(request);
-
-        session.beginTransaction();
-        if(doctorRepository.registerPatient(patient, session)){
-            Patient registeredPatient = doctorRepository.findByLogin(patient.getLogin(), session).get();
-            PatientDto patientDto = doctorDtoMapper.mapFrom(registeredPatient);
-            session.getTransaction().commit();
-            registrationResponse.send(response.getWriter(), response, patientDto, SC_CREATED);
-        } else throw new AlreadyExistsException();
+        Doctor doctor = createDoctor(request);
+        try {
+            session.beginTransaction();
+            if(doctorRepository.registerDoctor(doctor, session)) {
+                Doctor registeredDoctor = doctorRepository.findByLogin(doctor.getLogin(), session).get();
+                session.getTransaction().commit();
+                return doctorDtoMapper.mapFrom(registeredDoctor);
+            }else throw new AlreadyExistsException();
+        }catch (Exception exception){
+            session.getTransaction().rollback();
+            throw exception;
+        }
     }
 
-    private Patient createPatient(HttpServletRequest request) throws IOException, DtoValidationException {
-        Patient patient = new Patient();
-        PatientRegistrationDto registrationDto = registrationDoctorConverter.convert(request);
-        if (dtoValidator.isValid(registrationDto)) {
+    @SneakyThrows
+    private Doctor createDoctor(HttpServletRequest request) throws IOException, DtoValidationException {
+        DoctorRegistrationDto registrationDto = registrationDoctorConverter.convert(request);
+        try {
+            dtoValidator.isValid(registrationDto);
             return doctorMapper.mapFrom(registrationDto);
+
+        }catch (ConstraintViolationException exception){
+            throw new DtoValidationException(exception);
         }
-        return patient;
     }
 }

@@ -1,5 +1,6 @@
 package servlet.performer.patient;
 
+import exception.MethodNotAllowedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,10 @@ import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 
+/**
+ *      /join
+ */
+
 @RequiredArgsConstructor
 public class PatientRegistrationPerformer implements Performer {
     private static final String path = UrlPath.PATIENT_REGISTRATION;
@@ -27,8 +32,15 @@ public class PatientRegistrationPerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        PatientDto patientDto = service.registration(writer, request, response);
-        new PatientRegistrationResponse().send(response.getWriter(), response, patientDto, SC_CREATED);
+        if (request.getMethod().equals(HttpMethod.POST)){
+            performPOST(writer, request, response);
+        }else throw new MethodNotAllowedException();
+    }
+
+    @SneakyThrows
+    private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
+        PatientDto patientDto = service.registration(request);
+        new PatientRegistrationResponse().send(writer, response, patientDto, SC_CREATED);
     }
 
     @Override

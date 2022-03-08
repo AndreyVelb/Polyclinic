@@ -1,6 +1,8 @@
 package repository;
 
 import entity.Doctor;
+import entity.Patient;
+import exception.ServerTechnicalProblemsException;
 import org.hibernate.Session;
 
 import javax.print.Doc;
@@ -11,6 +13,19 @@ public class DoctorRepository extends AbstractRepository<Long, Doctor>{
 
     public DoctorRepository() {
         super(Doctor.class);
+    }
+
+    public boolean registerDoctor(Doctor doctor, Session session) throws ServerTechnicalProblemsException {
+        try {
+            session.createNativeQuery("LOCK TABLE polyclinics_doctors IN ROW EXCLUSIVE MODE").executeUpdate();
+            if((findByLogin(doctor.getLogin(), session).isEmpty())){
+                session.save(doctor);
+                session.flush();
+                return true;
+            } else return false;
+        } catch (Exception e){
+            throw new ServerTechnicalProblemsException();
+        }
     }
 
     public Optional<Doctor> authenticate(String login, String password, Session session) {

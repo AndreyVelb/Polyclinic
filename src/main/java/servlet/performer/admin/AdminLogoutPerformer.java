@@ -12,6 +12,10 @@ import util.UrlPath;
 import java.io.PrintWriter;
 import java.util.Set;
 
+/**
+ *      /admin/{id}/logout
+ */
+
 @RequiredArgsConstructor
 public class AdminLogoutPerformer implements Performer {
     private static final String path = UrlPath.ADMIN_PATH;

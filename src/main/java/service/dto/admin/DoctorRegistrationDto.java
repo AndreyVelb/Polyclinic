@@ -1,8 +1,10 @@
 package service.dto.admin;
 
 import entity.DoctorSpeciality;
+import entity.WorkSchedule;
 import entity.Qualification;
 import lombok.*;
+import service.dto.Dto;
 import service.dto.validator.DoctorMiddleNameConstraint;
 
 import javax.validation.constraints.NotNull;
@@ -13,7 +15,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Data
 @Builder
-public class DoctorRegistrationDto {
+public class DoctorRegistrationDto implements Dto {
 
     @NotNull(message = "Поле ФАМИЛИЯ не должно быть пустым")
     @Size(max = 20, message = "Поле ФАМИЛИЯ не должно превышать 20 символов")
@@ -44,4 +46,7 @@ public class DoctorRegistrationDto {
     @Pattern(regexp = "[a-zA-Z01-9]+", message = "Поле ПАРОЛЬ должно быть записано цифрами и(или) латинскими буквами")
     @Size(max = 30, message = "Поле ПАРОЛЬ не должно превышать 30 символов")
     String password;
+
+    @NotNull(message = "Поле ГРАФИК РАБОТЫ не должно быть пустым")
+    WorkSchedule workSchedule;
 }

@@ -23,9 +23,14 @@ import java.util.Set;
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+/**
+ *      /patient/{id}/doctors
+ */
+
 @RequiredArgsConstructor
 public class DoctorChoicePerformer implements Performer {
-    private static final String path = UrlPath.PATIENT_CHOOSE_DOCTOR;
+    private static final String path = UrlPath.PATIENT_PATH;
+    private static final String doctorsSubPath = UrlPath.ADMIN_SUBPATH_DOCTORS;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
     private final DoctorChoiceService service;
@@ -62,9 +67,10 @@ public class DoctorChoicePerformer implements Performer {
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
-            if (request.getPathInfo().split("/").length == 3){      // 0-""/ 1-"patient"/ 2-"doctors"
-                return true;
-            }else return false;
+            String[] requestPathParts = request.getPathInfo().split("/");
+            return requestPathParts.length == 4
+                    && requestPathParts[2].matches("[1-90]+")
+                    && requestPathParts[3].matches(doctorsSubPath);  // 0-""/ 1-"patient"/ 2-{id}/ 3-"doctors"
         }else return false;
     }
 }

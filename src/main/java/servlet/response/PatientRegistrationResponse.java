@@ -17,7 +17,7 @@ public class PatientRegistrationResponse implements ResponseInterface<PatientDto
         response.resetBuffer();
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setStatus(code);
-        response.setHeader("Location", "patient/login");
+        response.setHeader("Location", "patient/" + patientDto.getId());
         writer.flush();
     }
 }

@@ -13,9 +13,12 @@ import util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
+
+/**
+ *      /patient/login
+ */
 
 @RequiredArgsConstructor
 public class PatientLoginPerformer implements Performer {
@@ -36,12 +39,12 @@ public class PatientLoginPerformer implements Performer {
         Optional<PatientDto> mayBePatientDto = service.authenticate(request);
         if(mayBePatientDto.isPresent()){
             var session = request.getSession();
+            PatientDto patientDto = mayBePatientDto.get();
             PatientDto sessionPatientDto = (PatientDto) session.getAttribute("PATIENT");
             if (sessionPatientDto == null){
-                PatientDto patientDto = mayBePatientDto.get();
                 request.getSession().setAttribute("PATIENT", patientDto);
             }
-            response.sendRedirect(UrlPath.PATIENT_CHOOSE_DOCTOR);
+            response.sendRedirect(buildPatientsPathForChooseDoctor(patientDto));
         }else {
             throw new NotAuthenticatedException();
         }
@@ -61,5 +64,9 @@ public class PatientLoginPerformer implements Performer {
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
         return path.equals(requestPath);
+    }
+
+    private String buildPatientsPathForChooseDoctor(PatientDto patientDto){
+        return UrlPath.PATIENT_PATH + "/" + patientDto.getId() + "/" + UrlPath.PATIENT_SUBPATH_DOCTORS;
     }
 }

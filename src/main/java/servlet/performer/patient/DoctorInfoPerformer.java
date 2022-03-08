@@ -5,27 +5,25 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.hibernate.hql.internal.ast.ParseErrorHandler;
 import service.dto.doctor.DoctorDto;
-import service.patient.DoctorChoiceService;
 import service.patient.DoctorInfoService;
 import servlet.converter.response.DoctorDtoConverter;
-import servlet.converter.response.DoctorDtoListConverter;
 import servlet.performer.Performer;
-import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Set;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+/**
+ *      /patient/{id}/doctors/{id}
+ */
 
 @RequiredArgsConstructor
 public class DoctorInfoPerformer implements Performer {
-    private static final String path = UrlPath.PATIENT_CHOOSE_DOCTOR;
+    private static final String path = UrlPath.PATIENT_PATH;
+    private static final String doctorsSubPath = UrlPath.PATIENT_SUBPATH_DOCTORS;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
     private final DoctorInfoService service;
@@ -62,9 +60,11 @@ public class DoctorInfoPerformer implements Performer {
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
-            if (request.getPathInfo().split("/").length == 3){      // 0-""/ 1-"patient"/ 2-"doctors"
-                return true;
-            }else return false;
+            String[] requestPathParts = request.getPathInfo().split("/");
+            return requestPathParts.length == 5
+                    && requestPathParts[2].matches("[1-90]+")
+                    && requestPathParts[3].matches(doctorsSubPath)
+                    && requestPathParts[4].matches("[1-90]+");  // 0-""/ 1-"patient"/ 2-{id}/ 3-"doctors"/ 4-{id}
         }else return false;
     }
 }

@@ -1,10 +1,9 @@
 package service.mapper;
 
-import service.dto.admin.DoctorRegistrationDto;
 import entity.Doctor;
+import service.dto.admin.DoctorRegistrationDto;
 
-public class DoctorRegistrationMapper implements Mapper<DoctorRegistrationDto, Doctor> {
-
+public class DoctorMapper implements Mapper<DoctorRegistrationDto, Doctor>{
     @Override
     public Doctor mapFrom(DoctorRegistrationDto dto) {
         return Doctor.builder()
@@ -15,7 +14,6 @@ public class DoctorRegistrationMapper implements Mapper<DoctorRegistrationDto, D
                 .qualification(dto.getQualification())
                 .login(dto.getLogin())
                 .password(dto.getPassword())
-                .schedule(dto.getWorkSchedule())
                 .build();
     }
 }

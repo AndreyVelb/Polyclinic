@@ -70,12 +70,10 @@ public class MedicCardPerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 5
+            return requestPathParts.length == 5
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(patientsSubPath)
-                    && requestPathParts[4].matches("[1-90]+")){  // 0-""/ 1-"doctor"/ 2-"{some id}"/ 3-"patients"/ 4-"{some id}"
-                return true;
-            }else return false;
+                    && requestPathParts[4].matches("[1-90]+");  // 0-""/ 1-"doctor"/ 2-{id}/ 3-"patients"/ 4-{id}
         }else return false;
     }
 }

@@ -9,8 +9,8 @@ import java.util.List;
 
 @Entity
 @Data
-@EqualsAndHashCode(exclude = "recordsWrittenByDoctor")
-@ToString(exclude = "recordsWrittenByDoctor")
+@EqualsAndHashCode(exclude = {"recordsWrittenByDoctor", "schedule"})
+@ToString(exclude = {"recordsWrittenByDoctor", "schedule"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -47,5 +47,11 @@ public class Doctor implements BaseEntity<Long> {
 
     @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AppointmentRecord> recordsWrittenByDoctor;
+
+    @OneToOne(cascade = CascadeType.ALL,
+              fetch = FetchType.LAZY,
+              optional = false)
+    @JoinColumn(name = "schedule_id")
+    private WorkSchedule schedule;
 
 }

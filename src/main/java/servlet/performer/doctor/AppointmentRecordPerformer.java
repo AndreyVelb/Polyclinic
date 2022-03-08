@@ -68,14 +68,13 @@ public class AppointmentRecordPerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 7
+
+            return requestPathParts.length == 7
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(patientsSubPath)
                     && requestPathParts[4].matches("[1-90]+")
                     && requestPathParts[5].matches(recordsSubPath)
-                    && requestPathParts[6].matches("[1-90]+")){  // 0-""/ 1-"doctor"/ 2-"{some_id}"/ 3-"patients"/ 4-"{some id}"/ 5-"records"/ 6-"{some id}"
-                return true;
-            }else return false;
+                    && requestPathParts[6].matches("[1-90]+");  // 0-""/ 1-"doctor"/ 2-{id}/ 3-"patients"/ 4-{id}/ 5-"records"/ 6-{id}
         }else return false;
     }
 }

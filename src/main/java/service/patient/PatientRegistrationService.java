@@ -19,6 +19,7 @@ import servlet.converter.request.RegistrationPatientConverter;
 import service.dto.validator.DtoValidator;
 import util.SessionPool;
 
+import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -36,7 +37,7 @@ public class PatientRegistrationService {
     private final DtoValidator dtoValidator;
 
     @SneakyThrows
-    public PatientDto registration(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws AlreadyExistsException, IOException, ServerTechnicalProblemsException, DtoValidationException {
+    public PatientDto registration(HttpServletRequest request) {
         Session session = SessionPool.getSession();
         Patient patient = createPatient(request);
         try {
@@ -45,24 +46,21 @@ public class PatientRegistrationService {
                 Patient registeredPatient = patientRepository.findByLogin(patient.getLogin(), session).get();
                 session.getTransaction().commit();
                 return patientDtoMapper.mapFrom(registeredPatient);
-
-                registrationResponse.send(response.getWriter(), response, patientDto, SC_CREATED);
-            }
+            }else throw new AlreadyExistsException();
         }catch (Exception exception){
             session.getTransaction().rollback();
             throw exception;
         }
-
-
-             else throw new AlreadyExistsException();
     }
 
-    private Patient createPatient(HttpServletRequest request) throws IOException, DtoValidationException {
-        Patient patient = new Patient();
+    @SneakyThrows
+    private Patient createPatient(HttpServletRequest request) {
         PatientRegistrationDto registrationDto = registrationPatientConverter.convert(request);
-        if (dtoValidator.isValid(registrationDto)) {
+        try {
+            dtoValidator.isValid(registrationDto);
             return patientMapper.mapFrom(registrationDto);
+        }catch (ConstraintViolationException exception){
+            throw new DtoValidationException(exception);
         }
-        return patient;
     }
 }

@@ -65,11 +65,9 @@ public class SearchPatientPerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 4
+            return requestPathParts.length == 4
                     && requestPathParts[2].matches("[1-90]+")
-                    && requestPathParts[3].matches(patientsSubPath)){  // 0-""/ 1-"doctor"/ 2-"{some id}"/ 3-"patients"
-                return true;
-            }else return false;
+                    && requestPathParts[3].matches(patientsSubPath);    // 0-""/ 1-"doctor"/ 2-{id}/ 3-"patients"
         }else return false;
     }
 }
