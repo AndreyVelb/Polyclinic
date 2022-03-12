@@ -7,29 +7,22 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.dto.doctor.DoctorDto;
 import service.dto.patient.PatientDto;
 import util.UrlPath;
 
 import java.io.IOException;
 import java.util.Set;
 
-@WebFilter({UrlPath.ADMIN_PATH, UrlPath.ADMIN_LOGOUT, UrlPath.ADMIN_DOCTORS,
-            UrlPath.ADMIN_DOCTOR_REGISTRATION, UrlPath.ADMIN_CREATE_SCHEDULE_ON_WEEK,
-            UrlPath.ADMIN_PATH_WITH_INFO})
+@WebFilter({UrlPath.ADMIN_PATH + "/*"})
 public class AuthenticatedAdminFilter extends AbstractFilter{
-    private static final Set<String> AUTH_ADMIN_PATHS = Set.of(UrlPath.ADMIN_PATH, UrlPath.ADMIN_LOGOUT,
-                                                               UrlPath.ADMIN_DOCTORS, UrlPath.ADMIN_DOCTOR_REGISTRATION,
-                                                               UrlPath.ADMIN_CREATE_SCHEDULE_ON_WEEK,
-                                                               UrlPath.ADMIN_PATH_WITH_INFO);
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-        String requestUri = httpRequest.getRequestURI();
-
-        if (isAdminLoggedIn(httpRequest) && isRightPath(requestUri, AUTH_ADMIN_PATHS)){
+        if (isAdminLoggedIn(httpRequest)){
             chain.doFilter(httpRequest, httpResponse);
         }else {
             var previousPage = httpRequest.getHeader("referer");
@@ -38,7 +31,14 @@ public class AuthenticatedAdminFilter extends AbstractFilter{
     }
 
     private boolean isAdminLoggedIn(HttpServletRequest httpRequest){
-        PatientDto patientDto = (PatientDto) httpRequest.getSession().getAttribute("ADMIN");
-        return patientDto != null;
+        DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute("ADMIN");
+        if (doctorDto != null){
+            return isIdTrue(httpRequest, doctorDto.getId());
+        }else return false;
+    }
+
+    private boolean isIdTrue(HttpServletRequest httpRequest, Long idInSession){
+        String[] requestPathParts = httpRequest.getPathInfo().split("/");
+        return Long.parseLong(requestPathParts[2]) == idInSession;
     }
 }

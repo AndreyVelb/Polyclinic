@@ -30,7 +30,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 @RequiredArgsConstructor
 public class DoctorChoicePerformer implements Performer {
     private static final String path = UrlPath.PATIENT_PATH;
-    private static final String doctorsSubPath = UrlPath.ADMIN_SUBPATH_DOCTORS;
+    private static final String doctorsSubPath = UrlPath.PATIENT_SUBPATH_DOCTORS;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
     private final DoctorChoiceService service;

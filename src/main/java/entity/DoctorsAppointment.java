@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "doctors_appointments")
+@Table(name = "timetable")
 public class DoctorsAppointment implements BaseEntity<Long>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

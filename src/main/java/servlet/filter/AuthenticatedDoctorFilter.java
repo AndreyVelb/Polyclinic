@@ -10,19 +10,15 @@ import util.UrlPath;
 import java.io.IOException;
 import java.util.Set;
 
-@WebFilter({UrlPath.DOCTOR_LOGOUT, UrlPath.DOCTOR_PATH_WITHOUT_INFO, UrlPath.DOCTOR_PATH_WITH_INFO})
+@WebFilter(UrlPath.DOCTOR_PATH + "/*")
 public class AuthenticatedDoctorFilter extends AbstractFilter {
-    private static final Set<String> AUTH_DOCTORS_PATHS = Set.of(UrlPath.DOCTOR_LOGOUT, UrlPath.DOCTOR_PATH_WITHOUT_INFO,
-                                                                 UrlPath.DOCTOR_PATH_WITH_INFO);
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-        String requestUri = httpRequest.getRequestURI();
-
-        if (isDoctorLoggedIn(httpRequest) && isRightPath(requestUri, AUTH_DOCTORS_PATHS)){
+        if (isDoctorLoggedIn(httpRequest)){
             chain.doFilter(httpRequest, httpResponse);
         }else {
             var previousPage = httpRequest.getHeader("referer");
@@ -32,6 +28,13 @@ public class AuthenticatedDoctorFilter extends AbstractFilter {
 
     private boolean isDoctorLoggedIn(HttpServletRequest httpRequest){
         DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute("DOCTOR");
-        return doctorDto != null;
+        if (doctorDto != null){
+            return isIdTrue(httpRequest, doctorDto.getId());
+        }else return false;
+    }
+
+    private boolean isIdTrue(HttpServletRequest httpRequest, Long idInSession){
+        String[] requestPathParts = httpRequest.getPathInfo().split("/");
+        return Long.parseLong(requestPathParts[2]) == idInSession;
     }
 }

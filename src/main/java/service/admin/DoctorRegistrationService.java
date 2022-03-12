@@ -26,6 +26,7 @@ import util.SessionPool;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 
@@ -57,7 +58,7 @@ public class DoctorRegistrationService {
     }
 
     @SneakyThrows
-    private Doctor createDoctor(HttpServletRequest request) throws IOException, DtoValidationException {
+    private Doctor createDoctor(HttpServletRequest request) {
         DoctorRegistrationDto registrationDto = registrationDoctorConverter.convert(request);
         try {
             dtoValidator.isValid(registrationDto);

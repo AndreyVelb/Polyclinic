@@ -10,18 +10,15 @@ import util.UrlPath;
 import java.io.IOException;
 import java.util.Set;
 
-@WebFilter({UrlPath.PATIENT_LOGOUT})
+@WebFilter({UrlPath.PATIENT_PATH + "/*"})
 public class AuthenticatedPatientFilter extends AbstractFilter{
-    private static final Set<String> AUTH_PATIENTS_PATHS = Set.of(UrlPath.PATIENT_LOGOUT);
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-        String requestUri = httpRequest.getRequestURI();
-
-        if (isPatientLoggedIn(httpRequest) && isRightPath(requestUri, AUTH_PATIENTS_PATHS)){
+        if (isPatientLoggedIn(httpRequest)){
             chain.doFilter(httpRequest, httpResponse);
         }else {
             httpResponse.sendRedirect(UrlPath.PATIENT_LOGIN);
@@ -30,6 +27,13 @@ public class AuthenticatedPatientFilter extends AbstractFilter{
 
     private boolean isPatientLoggedIn(HttpServletRequest httpRequest){
         PatientDto patientDto = (PatientDto) httpRequest.getSession().getAttribute("PATIENT");
-        return patientDto != null;
+        if (patientDto != null){
+            return isIdTrue(httpRequest, patientDto.getId());
+        }else return false;
+    }
+
+    private boolean isIdTrue(HttpServletRequest httpRequest, Long idInSession){
+        String[] requestPathParts = httpRequest.getPathInfo().split("/");
+        return Long.parseLong(requestPathParts[2]) == idInSession;
     }
 }

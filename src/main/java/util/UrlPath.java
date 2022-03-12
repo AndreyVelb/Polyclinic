@@ -10,7 +10,8 @@ public class UrlPath {
     public static final String ADMIN_SUBPATH_DOC_REGISTRATION = "doc-registration";
 //    public static final String ADMIN_SUBPATH_DOCTORS = "doctors";
 //    public static final String ADMIN_SUBPATH_CHANGE_DOCTORS_SCHEDULE = "change-schedule";
-    public static final String ADMIN_CREATE_SCHEDULE_ON_WEEK = "admin/next_week-schedule";
+    public static final String ADMIN_SUBPATH_CREATE_TIMETABLE = "next-week-timetable";
+    public static final String ADMIN_SUBPATH_TIMETABLE = "timetable";
 
 
     public static final String DOCTOR_LOGIN = "/doctor/login";

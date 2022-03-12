@@ -10,17 +10,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import repository.AppointmentRecordRepository;
 import repository.DoctorRepository;
+import repository.DoctorsAppointmentRepository;
 import repository.PatientRepository;
+import service.admin.DoctorRegistrationService;
+import service.admin.NextWeekTimetableService;
+import service.admin.TimetableService;
 import service.doctor.*;
 import service.dto.validator.DtoValidator;
 import service.mapper.*;
 import service.patient.PatientLoginService;
 import service.patient.PatientRegistrationService;
 import servlet.converter.request.*;
-import servlet.converter.response.AppointmentRecordConverter;
-import servlet.converter.response.AppointmentRecordDtoListConverter;
-import servlet.converter.response.PatientDtoConverter;
-import servlet.converter.response.PatientDtoListConverter;
+import servlet.converter.response.*;
+import servlet.performer.admin.DoctorRegistrationPerformer;
+import servlet.performer.admin.NextWeekTimetablePerformer;
+import servlet.performer.admin.TimetablePerformer;
 import servlet.performer.doctor.*;
 import servlet.performer.patient.PatientLoginPerformer;
 import servlet.performer.patient.PatientLogoutPerformer;
@@ -47,6 +51,7 @@ public class MainServlet extends HttpServlet {
         AppointmentRecordRepository appointmentRecordRepository = new AppointmentRecordRepository();
         DoctorRepository doctorRepository = new DoctorRepository();
         PatientRepository patientRepository = new PatientRepository();
+        DoctorsAppointmentRepository doctorsAppointmentRepository = new DoctorsAppointmentRepository();
 
         DtoValidator dtoValidator = new DtoValidator();
 
@@ -60,13 +65,17 @@ public class MainServlet extends HttpServlet {
         AppointmentRecordDtoListConverter appointmentRecordDtoListConverter = new AppointmentRecordDtoListConverter(objectMapper);
         PatientDtoConverter patientDtoConverter = new PatientDtoConverter(objectMapper);
         PatientDtoListConverter patientDtoListConverter = new PatientDtoListConverter(objectMapper);
+        DocAppForAdminDtoListConverter docAppForAdminDtoListConverter = new DocAppForAdminDtoListConverter(objectMapper);
+        RegistrationDoctorConverter registrationDoctorConverter = new RegistrationDoctorConverter(objectMapper);
 
         DoctorDtoMapper doctorDtoMapper = new DoctorDtoMapper();
-        DoctorRegistrationMapper doctorRegistrationMapper = new DoctorRegistrationMapper();
         PatientDtoMapper patientDtoMapper = new PatientDtoMapper();
         PatientMapper patientMapper = new PatientMapper();
         AppointmentRecordDtoMapper appointmentRecordDtoMapper = new AppointmentRecordDtoMapper(doctorDtoMapper, patientDtoMapper);
         AppointmentRecordMapper appointmentRecordMapper = new AppointmentRecordMapper();
+        ScheduleAsMapDtoMapper scheduleAsListDtoMapper = new ScheduleAsMapDtoMapper();
+        DoctorsAppointmentDtoMapper doctorsAppointmentDtoMapper = new DoctorsAppointmentDtoMapper(doctorDtoMapper, patientDtoMapper);
+        DoctorMapper doctorMapper = new DoctorMapper();
 
         AppointmentRecordCreateService appointmentRecordCreateService = new AppointmentRecordCreateService(patientRepository, appointmentRecordRepository, doctorRepository,
                 appointmentRecordRequestConverter, appointmentRecordMapper, appointmentRecordDtoMapper, dtoValidator);
@@ -77,6 +86,9 @@ public class MainServlet extends HttpServlet {
         SearchPatientService searchPatientService = new SearchPatientService(patientRepository, patientLastNameConverter, patientDtoMapper, dtoValidator);
         PatientLoginService patientLoginService = new PatientLoginService(patientRepository, patientLoginConverter, patientDtoMapper);
         PatientRegistrationService patientRegistrationService = new PatientRegistrationService(patientRepository, registrationPatientConverter, patientMapper, patientDtoMapper, dtoValidator);
+        NextWeekTimetableService nextWeekTimetableService = new NextWeekTimetableService(doctorRepository, doctorsAppointmentRepository, scheduleAsListDtoMapper);
+        TimetableService timetableService = new TimetableService(doctorsAppointmentRepository, doctorsAppointmentDtoMapper);
+        DoctorRegistrationService doctorRegistrationService = new DoctorRegistrationService(doctorRepository, registrationDoctorConverter, doctorMapper, doctorDtoMapper, dtoValidator);
 
         AppointmentRecordCreatePerformer appointmentRecordCreatePerformer = new AppointmentRecordCreatePerformer(appointmentRecordCreateService);
         AppointmentRecordPerformer appointmentRecordPerformer = new AppointmentRecordPerformer(appointmentRecordService, appointmentRecordConverter);
@@ -88,17 +100,24 @@ public class MainServlet extends HttpServlet {
         PatientLoginPerformer patientLoginPerformer = new PatientLoginPerformer(patientLoginService);
         PatientLogoutPerformer patientLogoutPerformer = new PatientLogoutPerformer();
         PatientRegistrationPerformer patientRegistrationPerformer = new PatientRegistrationPerformer(patientRegistrationService);
+        DoctorRegistrationPerformer doctorRegistrationPerformer = new DoctorRegistrationPerformer(doctorRegistrationService);
+        NextWeekTimetablePerformer nextWeekTimetablePerformer = new NextWeekTimetablePerformer(nextWeekTimetableService);
+        TimetablePerformer timetablePerformer = new TimetablePerformer(timetableService, docAppForAdminDtoListConverter);
 
         List<Performer> allPerformers = List.of(doctorLoginPerformer, searchPatientPerformer,
                                                 medicCardPerformer, appointmentRecordCreatePerformer,
                                                 appointmentRecordPerformer, patientsRecordsPerformer,
                                                 doctorLogoutPerformer, patientRegistrationPerformer,
-                                                patientLoginPerformer, patientLogoutPerformer);
-        performerDispatcher = new PerformerDispatcher( doctorLoginPerformer, searchPatientPerformer,
-                                                       medicCardPerformer, appointmentRecordCreatePerformer,
-                                                       appointmentRecordPerformer, patientsRecordsPerformer,
-                                                       doctorLogoutPerformer, patientRegistrationPerformer,
-                                                       patientLoginPerformer, patientLogoutPerformer, allPerformers);
+                                                patientLoginPerformer, patientLogoutPerformer,
+                                                doctorRegistrationPerformer, nextWeekTimetablePerformer,
+                                                timetablePerformer);
+        performerDispatcher = new PerformerDispatcher(doctorLoginPerformer, searchPatientPerformer,
+                                                      medicCardPerformer, appointmentRecordCreatePerformer,
+                                                      appointmentRecordPerformer, patientsRecordsPerformer,
+                                                      doctorLogoutPerformer, patientRegistrationPerformer,
+                                                      patientLoginPerformer, patientLogoutPerformer,
+                                                      doctorRegistrationPerformer, nextWeekTimetablePerformer,
+                                                      timetablePerformer, allPerformers);
     }
 
     @Override

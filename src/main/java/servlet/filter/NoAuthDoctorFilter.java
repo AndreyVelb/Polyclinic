@@ -24,12 +24,17 @@ public class NoAuthDoctorFilter extends AbstractFilter{
         if (!isDoctorLoggedIn(httpRequest) && isRightPath(requestUri, NO_AUTH_DOCTORS_PATHS)) {
             chain.doFilter(httpRequest, httpResponse);
         } else {
-            httpResponse.sendRedirect(UrlPath.DOCTOR_LOGOUT);
+            httpResponse.sendRedirect(UrlPath.DOCTOR_PATH + "/" + getDoctorId(httpRequest) + "/" + UrlPath.DOCTOR_SUBPATH_LOGOUT);
         }
     }
 
     private boolean isDoctorLoggedIn(HttpServletRequest httpRequest){
         DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute("DOCTOR");
         return doctorDto != null;
+    }
+
+    private Long getDoctorId(HttpServletRequest httpRequest){
+        String[] requestPathParts = httpRequest.getPathInfo().split("/");
+        return Long.parseLong(requestPathParts[2]);
     }
 }
