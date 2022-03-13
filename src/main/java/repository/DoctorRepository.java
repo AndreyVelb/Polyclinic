@@ -17,7 +17,7 @@ public class DoctorRepository extends AbstractRepository<Long, Doctor>{
 
     public boolean registerDoctor(Doctor doctor, Session session) throws ServerTechnicalProblemsException {
         try {
-            session.createNativeQuery("LOCK TABLE polyclinics_doctors IN ROW EXCLUSIVE MODE").executeUpdate();
+            session.createNativeQuery("LOCK TABLE doctors IN ROW EXCLUSIVE MODE").executeUpdate();
             if((findByLogin(doctor.getLogin(), session).isEmpty())){
                 session.save(doctor);
                 session.flush();

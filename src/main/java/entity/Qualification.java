@@ -1,18 +1,25 @@
 package entity;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonValue;
+
+import javax.persistence.criteria.CriteriaBuilder;
 
 public enum Qualification {
-    @JsonProperty("6")
-    SIXTH,
-    @JsonProperty("5")
-    FIFTH,
-    @JsonProperty("4")
-    FOURTH,
-    @JsonProperty("3")
-    THIRD,
-    @JsonProperty("2")
-    SECOND,
-    @JsonProperty("1")
-    FIRST;
+    FIRST(1),
+    SECOND(2),
+    THIRD(3),
+    FOURTH(4),
+    FIFTH(5),
+    SIXTH(6);
+
+    private Integer qualification;
+
+    Qualification(Integer qualification){
+        this.qualification = qualification;
+    }
+
+    @JsonValue
+    public Integer getQualification(){
+        return qualification;
+    }
 }

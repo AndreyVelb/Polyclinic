@@ -15,7 +15,7 @@ public class RegistrationDoctorConverter implements RequestConverter<HttpServlet
     @Override
     public DoctorRegistrationDto convert(HttpServletRequest jsonRequest) throws IOException {
         StringBuffer stringBuffer = new StringBuffer();
-        String line = null;
+        String line;
 
         try (var reader = jsonRequest.getReader()){
             while ((line = reader.readLine()) != null){

@@ -4,6 +4,9 @@ import entity.DoctorsAppointment;
 import lombok.RequiredArgsConstructor;
 import service.dto.admin.DoctorsAppointmentForAdminDto;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @RequiredArgsConstructor
 public class DoctorsAppointmentDtoMapper implements Mapper<DoctorsAppointment, DoctorsAppointmentForAdminDto>{
     private final DoctorDtoMapper doctorDtoMapper;
@@ -15,7 +18,7 @@ public class DoctorsAppointmentDtoMapper implements Mapper<DoctorsAppointment, D
                 .id(doctorsAppointment.getId())
                 .doctorDto(doctorDtoMapper.mapFrom(doctorsAppointment.getDoctor()))
                 .patientDto(patientDtoMapper.mapFrom(doctorsAppointment.getPatient()))
-                .dateAndTime(doctorsAppointment.getAppointmentDateTime())
+                .dateAndTime(LocalDateTime.parse(doctorsAppointment.getAppointmentDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
                 .build();
     }
 }

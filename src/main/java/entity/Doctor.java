@@ -9,12 +9,12 @@ import java.util.List;
 
 @Entity
 @Data
-@EqualsAndHashCode(exclude = {"recordsWrittenByDoctor", "schedule"})
-@ToString(exclude = {"recordsWrittenByDoctor", "schedule"})
+@EqualsAndHashCode(exclude = {"recordsWrittenByDoctor"})
+@ToString(exclude = {"recordsWrittenByDoctor"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "polyclinics_doctors")
+@Table(name = "doctors")
 public class Doctor implements BaseEntity<Long> {
 
     @Id
@@ -45,13 +45,15 @@ public class Doctor implements BaseEntity<Long> {
     @ColumnTransformer(write = "crypt(?, gen_salt('bf'))")
     private String password;
 
+//    @OneToOne(mappedBy = "doctor", cascade = CascadeType.ALL, optional = false)
+//    private WorkSchedule schedule;
+
     @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AppointmentRecord> recordsWrittenByDoctor;
 
-    @OneToOne(cascade = CascadeType.ALL,
-              fetch = FetchType.LAZY,
-              optional = false)
-    @JoinColumn(name = "schedule_id")
-    private WorkSchedule schedule;
+//    public void setSchedule(WorkSchedule schedule){
+//        schedule.setDoctor(this);
+//        this.schedule = schedule;
+//    }
 
 }

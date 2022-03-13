@@ -8,10 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
-import repository.AppointmentRecordRepository;
-import repository.DoctorRepository;
-import repository.DoctorsAppointmentRepository;
-import repository.PatientRepository;
+import repository.*;
 import service.admin.DoctorRegistrationService;
 import service.admin.NextWeekTimetableService;
 import service.admin.TimetableService;
@@ -52,6 +49,7 @@ public class MainServlet extends HttpServlet {
         DoctorRepository doctorRepository = new DoctorRepository();
         PatientRepository patientRepository = new PatientRepository();
         DoctorsAppointmentRepository doctorsAppointmentRepository = new DoctorsAppointmentRepository();
+        WorkScheduleRepository workScheduleRepository = new WorkScheduleRepository();
 
         DtoValidator dtoValidator = new DtoValidator();
 
@@ -86,9 +84,9 @@ public class MainServlet extends HttpServlet {
         SearchPatientService searchPatientService = new SearchPatientService(patientRepository, patientLastNameConverter, patientDtoMapper, dtoValidator);
         PatientLoginService patientLoginService = new PatientLoginService(patientRepository, patientLoginConverter, patientDtoMapper);
         PatientRegistrationService patientRegistrationService = new PatientRegistrationService(patientRepository, registrationPatientConverter, patientMapper, patientDtoMapper, dtoValidator);
-        NextWeekTimetableService nextWeekTimetableService = new NextWeekTimetableService(doctorRepository, doctorsAppointmentRepository, scheduleAsListDtoMapper);
+        NextWeekTimetableService nextWeekTimetableService = new NextWeekTimetableService(doctorRepository, doctorsAppointmentRepository, workScheduleRepository, scheduleAsListDtoMapper);
         TimetableService timetableService = new TimetableService(doctorsAppointmentRepository, doctorsAppointmentDtoMapper);
-        DoctorRegistrationService doctorRegistrationService = new DoctorRegistrationService(doctorRepository, registrationDoctorConverter, doctorMapper, doctorDtoMapper, dtoValidator);
+        DoctorRegistrationService doctorRegistrationService = new DoctorRegistrationService(doctorRepository, workScheduleRepository, registrationDoctorConverter, doctorMapper, doctorDtoMapper, dtoValidator);
 
         AppointmentRecordCreatePerformer appointmentRecordCreatePerformer = new AppointmentRecordCreatePerformer(appointmentRecordCreateService);
         AppointmentRecordPerformer appointmentRecordPerformer = new AppointmentRecordPerformer(appointmentRecordService, appointmentRecordConverter);
@@ -177,7 +175,5 @@ public class MainServlet extends HttpServlet {
         }catch (NotAuthenticatedException exception){
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_UNAUTHORIZED);
         }
-        }
-
-
+    }
 }

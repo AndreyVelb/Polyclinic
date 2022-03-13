@@ -2,11 +2,13 @@ package service.admin;
 
 import entity.Doctor;
 import entity.DoctorsAppointment;
+import entity.WorkSchedule;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.DoctorRepository;
 import repository.DoctorsAppointmentRepository;
+import repository.WorkScheduleRepository;
 import service.dto.admin.ScheduleAsMapDto;
 import service.mapper.ScheduleAsMapDtoMapper;
 import util.SessionPool;
@@ -22,6 +24,7 @@ public class NextWeekTimetableService {
 
     private final DoctorRepository doctorRepository;
     private final DoctorsAppointmentRepository doctorsAppointmentRepository;
+    private final WorkScheduleRepository workScheduleRepository;
 
     private final ScheduleAsMapDtoMapper scheduleAsListDtoMapper;
 
@@ -32,11 +35,9 @@ public class NextWeekTimetableService {
         try {
             session.beginTransaction();
             var mayBeLastAppDateAndTime = doctorsAppointmentRepository.getLatestAppointmentDate(session);
-            ArrayList<Doctor> allDoctors = doctorRepository.findAll(session);
+            ArrayList<WorkSchedule> allDoctorsSchedules = workScheduleRepository.findAll(session);
             ArrayList<ScheduleAsMapDto> scheduleDtoList = new ArrayList<>();
-            for (Doctor doctor : allDoctors) {
-                scheduleDtoList.add(scheduleAsListDtoMapper.mapFrom(doctor.getSchedule(), doctor));
-            }
+            allDoctorsSchedules.forEach(schedule -> scheduleDtoList.add(scheduleAsListDtoMapper.mapFrom(schedule, schedule.getDoctor())));
             List<DoctorsAppointment> newWeekTimetable = createNewWeekTimetable(scheduleDtoList, mayBeLastAppDateAndTime);
             newWeekTimetable.forEach(doctorsAppointment -> doctorsAppointmentRepository.save(doctorsAppointment, session));
             session.getTransaction().commit();

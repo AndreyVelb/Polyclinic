@@ -1,18 +1,31 @@
 package entity;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonValue;
 
 public enum DoctorSpeciality {
-    @JsonProperty("глав-врач")
-    CHIEF_DOCTOR,
-    @JsonProperty("хирург")
-    SURGEON,
-    @JsonProperty("терапевт")
-    GENERAL_DOCTOR,
-    @JsonProperty("стоматолог")
-    DENTIST,
-    @JsonProperty("окулист")
-    OPTOMETRIST,
-    @JsonProperty("невролог")
-    NEUROLOGIST;
+
+    CHIEF_DOCTOR("глав-врач"),
+
+    SURGEON("хирург"),
+
+    GENERAL_DOCTOR("терапевт"),
+
+    DENTIST("стоматолог"),
+
+    OPTOMETRIST("окулист"),
+
+    NEUROLOGIST("невролог");
+
+    private String speciality;
+
+    DoctorSpeciality(String speciality){
+        this.speciality = speciality;
+    }
+
+    @JsonValue
+    public String getSpeciality(){
+        return speciality;
+    }
+
 }

@@ -1,13 +1,18 @@
 //import entity.Doctor;
 //import entity.DoctorSpeciality;
 //import entity.Qualification;
+//import entity.WorkSchedule;
 //import org.hibernate.Session;
+//import org.hibernate.SessionFactory;
 //import repository.DoctorRepository;
-//import util.SessionPool;
+//import util.HibernateUtil;
+//
+//import java.util.Optional;
 //
 //public class Main {
 //    public static void main(String[] args) {
-//        Session session = SessionPool.getSession();
+//        SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
+//        Session session = sessionFactory.openSession();
 //        DoctorRepository doctorNewDBRepository = new DoctorRepository();
 //        Doctor doctorNewDB = Doctor.builder()
 //                .lastName("Админ")
@@ -19,10 +24,25 @@
 //                .password("admin")
 //                .build();
 //        session.beginTransaction();
-//        doctorNewDBRepository.save(doctorNewDB, session);
+//        WorkSchedule schedule = WorkSchedule.builder()
+//                .doctor(doctorNewDB)
+//                .monday(Boolean.FALSE)
+//                .tuesday(Boolean.FALSE)
+//                .wednesday(Boolean.FALSE)
+//                .thursday(Boolean.FALSE)
+//                .friday(Boolean.FALSE)
+//                .saturday(Boolean.FALSE)
+//                .sunday(Boolean.FALSE)
+//                .build();
+////        session.save(doctorNewDB);
+//
+//
+//        session.save(schedule);
+//
 //        session.getTransaction().commit();
-
+//
 //    }
+//}
 //        try (SessionFactory newDBSessionFactory = HibernateUtil.buildSessionFactoryForNEWdb();
 //             SessionFactory oldDBSessionFactory = HibernateUtil.buildSessionFactoryForOLDdb()){
 //

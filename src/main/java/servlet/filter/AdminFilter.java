@@ -8,14 +8,12 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.dto.doctor.DoctorDto;
-import service.dto.patient.PatientDto;
 import util.UrlPath;
 
 import java.io.IOException;
-import java.util.Set;
 
-@WebFilter({UrlPath.ADMIN_PATH + "/*"})
-public class AuthenticatedAdminFilter extends AbstractFilter{
+@WebFilter(UrlPath.ADMIN_PATH + "/*")
+public class AdminFilter extends AbstractFilter{
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
@@ -32,9 +30,7 @@ public class AuthenticatedAdminFilter extends AbstractFilter{
 
     private boolean isAdminLoggedIn(HttpServletRequest httpRequest){
         DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute("ADMIN");
-        if (doctorDto != null){
-            return isIdTrue(httpRequest, doctorDto.getId());
-        }else return false;
+        return doctorDto != null && isIdTrue(httpRequest, doctorDto.getId());
     }
 
     private boolean isIdTrue(HttpServletRequest httpRequest, Long idInSession){

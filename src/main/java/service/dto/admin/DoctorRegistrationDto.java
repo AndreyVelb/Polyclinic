@@ -4,6 +4,9 @@ import entity.DoctorSpeciality;
 import entity.WorkSchedule;
 import entity.Qualification;
 import lombok.*;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonValue;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import service.dto.Dto;
 import service.dto.validator.DoctorMiddleNameConstraint;
 
@@ -48,5 +51,5 @@ public class DoctorRegistrationDto implements Dto {
     String password;
 
     @NotNull(message = "Поле ГРАФИК РАБОТЫ не должно быть пустым")
-    WorkSchedule workSchedule;
+    WorkSchedule schedule;
 }

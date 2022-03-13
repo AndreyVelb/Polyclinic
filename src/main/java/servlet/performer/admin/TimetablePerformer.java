@@ -28,7 +28,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 public class TimetablePerformer implements Performer {
     private static final String path = UrlPath.ADMIN_PATH;
     private static final String timetableSubPath = UrlPath.ADMIN_SUBPATH_TIMETABLE;
-    private static final Set<String> performableMethods = Set.of(HttpMethod.POST);
+    private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
     private final TimetableService service;
 

@@ -25,13 +25,13 @@ public class ScheduleAsMapDtoMapper implements Mapper<WorkSchedule, ScheduleAsMa
 
     private Map<DayOfWeek, Boolean> getScheduleAsMap(WorkSchedule schedule){
         Map<DayOfWeek, Boolean> scheduleAsList = new HashMap<>();
-        scheduleAsList.put(DayOfWeek.MONDAY, schedule.isMonday());
-        scheduleAsList.put(DayOfWeek.TUESDAY, schedule.isTuesday());
-        scheduleAsList.put(DayOfWeek.WEDNESDAY, schedule.isWednesday());
-        scheduleAsList.put(DayOfWeek.THURSDAY, schedule.isThursday());
-        scheduleAsList.put(DayOfWeek.FRIDAY, schedule.isFriday());
-        scheduleAsList.put(DayOfWeek.SATURDAY, schedule.isSaturday());
-        scheduleAsList.put(DayOfWeek.SUNDAY, schedule.isSunday());
+        scheduleAsList.put(DayOfWeek.MONDAY, schedule.getMonday());
+        scheduleAsList.put(DayOfWeek.TUESDAY, schedule.getTuesday());
+        scheduleAsList.put(DayOfWeek.WEDNESDAY, schedule.getWednesday());
+        scheduleAsList.put(DayOfWeek.THURSDAY, schedule.getThursday());
+        scheduleAsList.put(DayOfWeek.FRIDAY, schedule.getFriday());
+        scheduleAsList.put(DayOfWeek.SATURDAY, schedule.getSaturday());
+        scheduleAsList.put(DayOfWeek.SUNDAY, schedule.getSunday());
         return scheduleAsList;
     }
 }

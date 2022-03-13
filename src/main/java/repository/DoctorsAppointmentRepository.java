@@ -14,7 +14,7 @@ public class DoctorsAppointmentRepository extends AbstractRepository<Long, Docto
     }
 
     public Optional<LocalDateTime> getLatestAppointmentDate(Session session){
-        return Optional.ofNullable(session.createQuery("select max(docApp.appointmentDateTime) " +
+        return Optional.ofNullable(session.createQuery("select max (docApp.appointmentDateTime) " +
                                              "from DoctorsAppointment docApp", LocalDateTime.class).uniqueResult());
     }
 }

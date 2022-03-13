@@ -1,38 +1,29 @@
 package service.admin;
 
 import entity.Doctor;
-import entity.Patient;
+import entity.WorkSchedule;
 import exception.AlreadyExistsException;
 import exception.DtoValidationException;
-import exception.ServerTechnicalProblemsException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.DoctorRepository;
+import repository.WorkScheduleRepository;
 import service.dto.admin.DoctorRegistrationDto;
 import service.dto.doctor.DoctorDto;
-import service.dto.patient.PatientDto;
-import service.dto.patient.PatientRegistrationDto;
 import service.dto.validator.DtoValidator;
 import service.mapper.DoctorDtoMapper;
 import service.mapper.DoctorMapper;
-import service.mapper.PatientDtoMapper;
 import servlet.converter.request.RegistrationDoctorConverter;
-import servlet.response.PatientRegistrationResponse;
 import util.SessionPool;
 
 import javax.validation.ConstraintViolationException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-
-import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 
 @RequiredArgsConstructor
 public class DoctorRegistrationService {
     private final DoctorRepository doctorRepository;
+    private final WorkScheduleRepository workScheduleRepository;
 
     private final RegistrationDoctorConverter registrationDoctorConverter;
     private final DoctorMapper doctorMapper;
@@ -43,10 +34,14 @@ public class DoctorRegistrationService {
     @SneakyThrows
     public DoctorDto registration(HttpServletRequest request) {
         Session session = SessionPool.getSession();
-        Doctor doctor = createDoctor(request);
+        DoctorRegistrationDto doctorRegistrationDto = registrationDoctorConverter.convert(request);
+        Doctor doctor = createDoctor(doctorRegistrationDto);
+        WorkSchedule workSchedule = createSchedule(doctorRegistrationDto, doctor);
         try {
             session.beginTransaction();
-            if(doctorRepository.registerDoctor(doctor, session)) {
+
+            if( doctorRepository.registerDoctor(doctor, session)) {
+                workScheduleRepository.save(workSchedule, session);
                 Doctor registeredDoctor = doctorRepository.findByLogin(doctor.getLogin(), session).get();
                 session.getTransaction().commit();
                 return doctorDtoMapper.mapFrom(registeredDoctor);
@@ -58,8 +53,7 @@ public class DoctorRegistrationService {
     }
 
     @SneakyThrows
-    private Doctor createDoctor(HttpServletRequest request) {
-        DoctorRegistrationDto registrationDto = registrationDoctorConverter.convert(request);
+    private Doctor createDoctor(DoctorRegistrationDto registrationDto) {
         try {
             dtoValidator.isValid(registrationDto);
             return doctorMapper.mapFrom(registrationDto);
@@ -67,5 +61,11 @@ public class DoctorRegistrationService {
         }catch (ConstraintViolationException exception){
             throw new DtoValidationException(exception);
         }
+    }
+
+    private WorkSchedule createSchedule(DoctorRegistrationDto registrationDto, Doctor doctor){
+        WorkSchedule workSchedule = registrationDto.getSchedule();
+        workSchedule.setDoctor(doctor);
+        return workSchedule;
     }
 }

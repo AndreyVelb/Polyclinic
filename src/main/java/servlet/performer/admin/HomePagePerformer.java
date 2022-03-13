@@ -73,9 +73,7 @@ public class HomePagePerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 3 && requestPathParts[2].matches("[1-90]+")){  // 0-""/ 1-"admin"/ 2-"{some id}"
-                return true;
-            }else return false;
+            return requestPathParts.length == 3 && requestPathParts[2].matches("[1-90]+");      // 0-""/ 1-"admin"/ 2-"{some id}"
         }else return false;
     }
 }
