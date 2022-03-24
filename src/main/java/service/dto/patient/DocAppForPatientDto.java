@@ -1,12 +1,10 @@
-package service.dto.admin;
+package service.dto.patient;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import service.dto.Dto;
 import service.dto.doctor.DoctorDto;
-import service.dto.patient.PatientDto;
 
 import java.time.LocalDateTime;
 
@@ -14,13 +12,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Builder
-public class DoctorsAppointmentForAdminDto implements Dto {
+public class DocAppForPatientDto {
 
     Long id;
 
     DoctorDto doctorDto;
 
     LocalDateTime dateAndTime;
-
-    PatientDto patientDto;
 }

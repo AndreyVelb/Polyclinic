@@ -25,7 +25,7 @@ public class DoctorChoiceService {
         ArrayList<Doctor> doctorsList;
         try {
             session.beginTransaction();
-            doctorsList = doctorRepository.findAll(session);
+            doctorsList = (ArrayList<Doctor>) doctorRepository.findAllDoctorsExceptAdmins(session);
             session.getTransaction().commit();
         }catch (Exception exception){
             session.getTransaction().rollback();

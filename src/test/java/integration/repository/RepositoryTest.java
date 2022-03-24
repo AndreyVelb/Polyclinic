@@ -1,13 +1,13 @@
 package integration.repository;
 
 import entity.BaseEntity;
+import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Optional;
 
-public interface RepositoryTestInterface <K extends Serializable, E extends BaseEntity<K>>{
+public interface RepositoryTest<K extends Serializable, E extends BaseEntity<K>>{
 
     @Test
     void save ();

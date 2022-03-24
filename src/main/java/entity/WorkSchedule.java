@@ -48,9 +48,4 @@ public class WorkSchedule implements BaseEntity<Long>{
 
     @Column(name = "sunday")
     private Boolean sunday;
-
-//    public void setDoctor(Doctor doctor){
-//        doctor.setSchedule(this);
-//        this.doctor = doctor;
-//    }
 }

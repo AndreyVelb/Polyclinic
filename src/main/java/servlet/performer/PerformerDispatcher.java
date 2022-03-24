@@ -2,13 +2,9 @@ package servlet.performer;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import servlet.performer.admin.DoctorRegistrationPerformer;
-import servlet.performer.admin.NextWeekTimetablePerformer;
-import servlet.performer.admin.TimetablePerformer;
+import servlet.performer.admin.*;
 import servlet.performer.doctor.*;
-import servlet.performer.patient.PatientLoginPerformer;
-import servlet.performer.patient.PatientLogoutPerformer;
-import servlet.performer.patient.PatientRegistrationPerformer;
+import servlet.performer.patient.*;
 
 import java.util.*;
 
@@ -23,10 +19,16 @@ public class PerformerDispatcher {
     private final DoctorLogoutPerformer doctorLogoutPerformer;
     private final PatientRegistrationPerformer patientRegistrationPerformer;
     private final PatientLoginPerformer patientLoginPerformer;
+    private final DoctorChoicePerformer doctorChoicePerformer;
+    private final DoctorInfoPerformer doctorInfoPerformer;
+    private final DoctorsAppointmentsChoicePerformer doctorsAppointmentsPerformer;
+    private final BookingDoctorsAppointmentPerformer bookingDoctorsAppointmentPerformer;
     private final PatientLogoutPerformer patientLogoutPerformer;
+    private final AdminHomePagePerformer adminHomePagePerformer;
     private final DoctorRegistrationPerformer doctorRegistrationPerformer;
     private final NextWeekTimetablePerformer nextWeekTimetablePerformer;
     private final TimetablePerformer timetablePerformer;
+    private final AdminLogoutPerformer adminLogoutPerformer;
 
     private final List<Performer> allPerformers;
 

@@ -10,7 +10,7 @@ import util.UrlPath;
 import java.io.IOException;
 
 @WebFilter(UrlPath.DOCTOR_PATH + "/*")
-public class DoctorFilter extends AbstractFilter{
+public class DoctorFilter implements Filter{
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws ServletException, IOException {
@@ -25,16 +25,13 @@ public class DoctorFilter extends AbstractFilter{
                 chain.doFilter(httpRequest, httpResponse);
             } else httpResponse.sendRedirect(UrlPath.DOCTOR_LOGIN);
         } else {
-            doFilter(httpRequest, httpResponse, chain);
-//            httpResponse.sendRedirect(UrlPath.DOCTOR_PATH + "/" + getDoctorId(httpRequest) + "/" + UrlPath.DOCTOR_SUBPATH_LOGOUT);
+            chain.doFilter(httpRequest, httpResponse);
         }
     }
 
     private boolean isDoctorLoggedIn(HttpServletRequest httpRequest){
         DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute("DOCTOR");
-        if (doctorDto != null){
-            return isIdTrue(httpRequest, doctorDto.getId());
-        }else return false;
+        return doctorDto != null && isIdTrue(httpRequest, doctorDto.getId());
     }
 
     private boolean isAdminLoggedIn(HttpServletRequest httpRequest){
@@ -48,9 +45,4 @@ public class DoctorFilter extends AbstractFilter{
             return Long.parseLong(requestPathParts[2]) == idInSession;
         }else return requestPathParts[2].matches("login");
     }
-
-//    private Long getDoctorId(HttpServletRequest httpRequest){
-//        String[] requestPathParts = httpRequest.getPathInfo().split("/");
-//        return Long.parseLong(requestPathParts[2]);
-//    }
 }

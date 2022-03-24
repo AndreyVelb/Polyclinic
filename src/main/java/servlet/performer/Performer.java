@@ -9,8 +9,8 @@ import java.io.PrintWriter;
 
 public interface Performer {
 
-    void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, AlreadyExistsException, DtoValidationException,
-            ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException;
+    void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, DtoValidationException,
+            ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException, AlreadyBookedException;
 
     boolean isMethodCanBePerformed(HttpServletRequest request);
 

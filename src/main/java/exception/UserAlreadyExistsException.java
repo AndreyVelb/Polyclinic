@@ -1,9 +1,9 @@
 package exception;
 
-public class AlreadyExistsException extends Exception{
+public class UserAlreadyExistsException extends Exception{
     private final String message;
 
-    public AlreadyExistsException() {
+    public UserAlreadyExistsException() {
         this.message = "Пользователь с такими параметрами уже существует. Попробуйте еще раз введя другие данные...";
     }
 

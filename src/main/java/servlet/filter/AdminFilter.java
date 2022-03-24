@@ -1,9 +1,6 @@
 package servlet.filter;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,7 +10,7 @@ import util.UrlPath;
 import java.io.IOException;
 
 @WebFilter(UrlPath.ADMIN_PATH + "/*")
-public class AdminFilter extends AbstractFilter{
+public class AdminFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
@@ -35,6 +32,8 @@ public class AdminFilter extends AbstractFilter{
 
     private boolean isIdTrue(HttpServletRequest httpRequest, Long idInSession){
         String[] requestPathParts = httpRequest.getPathInfo().split("/");
-        return Long.parseLong(requestPathParts[2]) == idInSession;
+        if (requestPathParts[2].matches("[1-90]+")){
+            return Long.parseLong(requestPathParts[2]) == idInSession;
+        } else return false;
     }
 }

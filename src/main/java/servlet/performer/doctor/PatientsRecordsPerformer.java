@@ -15,7 +15,6 @@ import util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -38,7 +37,7 @@ public class PatientsRecordsPerformer implements Performer {
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, AlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
         if (request.getMethod().equals(HttpMethod.GET)){
             performGET(writer, request, response);
         }else throw new MethodNotAllowedException();

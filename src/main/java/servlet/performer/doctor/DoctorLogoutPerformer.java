@@ -54,7 +54,7 @@ public class DoctorLogoutPerformer implements Performer{
             String[] requestPathParts = request.getPathInfo().split("/");
             if(requestPathParts.length == 4
                     && requestPathParts[2].matches("[1-90]+")
-                    && requestPathParts[3].matches(logoutSubPath)){     // 0-""/ 1-"doctor"/ 2-"{some_id}"/ 3-"logout"
+                    && requestPathParts[3].matches(logoutSubPath)){     // 0-""/ 1-"doctor"/ 2-{id}/ 3-"logout"
                 return true;
             }else return false;
         }else return false;

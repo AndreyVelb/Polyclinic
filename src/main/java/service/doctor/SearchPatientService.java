@@ -23,7 +23,6 @@ public class SearchPatientService {
 
     private final PatientRepository patientRepository;
 
-    private final PatientLastNameConverter patientLastNameConverter;
     private final PatientDtoMapper patientDtoMapper;
 
     private final DtoValidator dtoValidator;
@@ -33,7 +32,7 @@ public class SearchPatientService {
         Session session = SessionPool.getSession();
         PatientLastNameDto patientLastNameDto = PatientLastNameDto.builder()
                 .lastName(request.getParameter("lastName"))
-                .build();                                        //patientLastNameConverter.convert(request);
+                .build();
         ArrayList<Patient> patientsList = new ArrayList<>();
         if (dtoValidator.isValid(patientLastNameDto)){
             session.beginTransaction();

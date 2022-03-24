@@ -1,27 +1,22 @@
 package servlet.performer.doctor;
 
-import entity.AppointmentRecord;
 import exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import service.doctor.AppointmentRecordCreateService;
 import service.doctor.AppointmentRecordService;
 import service.dto.doctor.AppointmentRecordDto;
 import servlet.converter.response.AppointmentRecordConverter;
 import servlet.performer.Performer;
-import servlet.response.AppointmentRecordCreateResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Set;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 /**
@@ -40,7 +35,7 @@ public class AppointmentRecordPerformer implements Performer {
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, AlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
         if (request.getMethod().equals(HttpMethod.GET)){
             performGET(writer, request, response);
         }else throw new MethodNotAllowedException();

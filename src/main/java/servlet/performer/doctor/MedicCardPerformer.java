@@ -1,6 +1,6 @@
 package servlet.performer.doctor;
 
-import exception.AlreadyExistsException;
+import exception.UserAlreadyExistsException;
 import exception.MethodNotAllowedException;
 import exception.NotAuthenticatedException;
 import exception.ServerTechnicalProblemsException;
@@ -18,7 +18,6 @@ import util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
@@ -39,7 +38,7 @@ public class MedicCardPerformer implements Performer {
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, AlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException {
         if (request.getMethod().equals(HttpMethod.GET)){
             performGET(writer, request, response);
         }else throw new MethodNotAllowedException();
@@ -48,7 +47,7 @@ public class MedicCardPerformer implements Performer {
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
         String[] requestPathParts = request.getPathInfo().split("/");
-        Long patientId =  Long.parseLong(String.valueOf(requestPathParts[3]));
+        Long patientId =  Long.parseLong(String.valueOf(requestPathParts[4]));
         PatientDto patientDto = service.getPatientMedicCard(patientId);
         String json = patientDtoConverter.convert(patientDto);
         JsonResponse jsonResponse = new JsonResponse();

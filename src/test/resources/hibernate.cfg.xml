@@ -14,6 +14,8 @@
     <mapping class="entity.Patient"/>
     <mapping class="entity.Doctor"/>
     <mapping class="entity.AppointmentRecord"/>
+    <mapping class="entity.DoctorsAppointment"/>
+    <mapping class="entity.WorkSchedule"/>
 
     <!-- DB schema will be updated if needed -->
 

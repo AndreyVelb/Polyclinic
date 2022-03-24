@@ -2,7 +2,7 @@ package service.admin;
 
 import entity.Doctor;
 import entity.WorkSchedule;
-import exception.AlreadyExistsException;
+import exception.UserAlreadyExistsException;
 import exception.DtoValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class DoctorRegistrationService {
                 Doctor registeredDoctor = doctorRepository.findByLogin(doctor.getLogin(), session).get();
                 session.getTransaction().commit();
                 return doctorDtoMapper.mapFrom(registeredDoctor);
-            }else throw new AlreadyExistsException();
+            }else throw new UserAlreadyExistsException();
         }catch (Exception exception){
             session.getTransaction().rollback();
             throw exception;

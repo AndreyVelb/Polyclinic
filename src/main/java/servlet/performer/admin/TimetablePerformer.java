@@ -5,10 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import service.admin.NextWeekTimetableService;
 import service.admin.TimetableService;
-import service.dto.admin.DoctorsAppointmentForAdminDto;
-import servlet.converter.response.DocAppForAdminDtoListConverter;
+import service.dto.admin.DocAppForAdminDto;
+import servlet.converter.response.DocAppDtoListForAdminConverter;
 import servlet.performer.Performer;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
@@ -32,7 +31,7 @@ public class TimetablePerformer implements Performer {
 
     private final TimetableService service;
 
-    private final DocAppForAdminDtoListConverter dtoListConverter;
+    private final DocAppDtoListForAdminConverter dtoListConverter;
 
     @Override
     @SneakyThrows
@@ -44,7 +43,7 @@ public class TimetablePerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        List<DoctorsAppointmentForAdminDto> timetableAsDto = service.getAllTimetable();
+        List<DocAppForAdminDto> timetableAsDto = service.getAllTimetable();
         String timetableAsJson = dtoListConverter.convert(timetableAsDto);
         new JsonResponse().send(writer, response, timetableAsJson, SC_OK);
     }

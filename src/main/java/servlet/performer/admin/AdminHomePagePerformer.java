@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import repository.DoctorRepository;
 import repository.PatientRepository;
-import service.admin.HomePageService;
+import service.admin.AdminHomePageService;
 import service.dto.admin.AdminStatisticsDto;
 import servlet.converter.response.AdminStatisticsDtoConverter;
 import servlet.performer.Performer;
@@ -19,18 +19,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
+import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 /**
  *      /admin/{id}
  */
 
 @RequiredArgsConstructor
-public class HomePagePerformer implements Performer {
+public class AdminHomePagePerformer implements Performer {
     private static final String path = UrlPath.ADMIN_PATH;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
-    private final HomePageService service;
+    private final AdminHomePageService service;
 
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
@@ -40,10 +40,10 @@ public class HomePagePerformer implements Performer {
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, AlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
         if (request.getMethod().equals(HttpMethod.GET)){
             performGET(writer, request, response);
-        }else throw new MethodNotAllowedException();
+        } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
@@ -55,7 +55,7 @@ public class HomePagePerformer implements Performer {
                 .doctorCount(doctorCount)
                 .build();
         String jsonStatistics = adminStatisticsDtoConverter.convert(adminStatisticsDto);
-        new JsonResponse().send(writer, response, jsonStatistics, SC_CREATED);
+        new JsonResponse().send(writer, response, jsonStatistics, SC_OK);
     }
 
     @Override

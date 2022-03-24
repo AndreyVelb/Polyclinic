@@ -9,7 +9,6 @@ import service.dto.doctor.DoctorDto;
 import service.patient.DoctorChoiceService;
 import servlet.converter.response.DoctorDtoListConverter;
 import servlet.performer.Performer;
-import servlet.response.AppointmentRecordCreateResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
@@ -17,10 +16,8 @@ import util.UrlPath;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 /**
@@ -40,7 +37,7 @@ public class DoctorChoicePerformer implements Performer {
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, AlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
         if (request.getMethod().equals(HttpMethod.GET)){
             performGET(writer, request, response);
         }else throw new MethodNotAllowedException();

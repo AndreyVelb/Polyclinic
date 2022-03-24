@@ -68,7 +68,7 @@ public class DoctorLoginPerformer implements Performer {
         if (sessionDoctorDto == null){
             session.setAttribute("DOCTOR", doctorDto);
         }
-        response.sendRedirect(UrlPath.DOCTOR_PATH + "/" + doctorDto.getId());
+        response.sendRedirect(UrlPath.DOCTOR_PATH + "/" + doctorDto.getId() + "/" + UrlPath.DOCTOR_SUBPATH_PATIENTS);
     }
 
     @Override

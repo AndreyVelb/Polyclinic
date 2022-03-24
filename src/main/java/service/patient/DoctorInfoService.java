@@ -39,6 +39,6 @@ public class DoctorInfoService {
 
     private Long extractDoctorIdFromRequest(HttpServletRequest request){
         String[] requestPathParts = request.getPathInfo().split("/");
-        return Long.parseLong(requestPathParts[3]);       // 0-""/ 1-"patient"/ 2-"doctors"/ 3-"{some id}"/...
+        return Long.parseLong(requestPathParts[4]);       // 0-""/ 1-"patient"/ 2-{id}/ 3-"doctors"/ 4-"{id}"/...
     }
 }

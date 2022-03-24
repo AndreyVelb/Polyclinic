@@ -10,7 +10,7 @@ import util.UrlPath;
 import java.io.IOException;
 
 @WebFilter({UrlPath.PATIENT_PATH + "/*", UrlPath.PATIENT_REGISTRATION})
-public class PatientFilter extends AbstractFilter {
+public class PatientFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
@@ -19,7 +19,7 @@ public class PatientFilter extends AbstractFilter {
 
         String requestUri = httpRequest.getRequestURI();
 
-        if (!isPatientRightLoggedIn(httpRequest)){
+        if (!isPatientLoggedIn(httpRequest)){
             if (requestUri.startsWith(UrlPath.PATIENT_REGISTRATION)
                 || requestUri.startsWith(UrlPath.PATIENT_LOGIN)){
                 chain.doFilter(httpRequest, httpResponse);
@@ -27,29 +27,12 @@ public class PatientFilter extends AbstractFilter {
         } else {
             chain.doFilter(httpRequest, httpResponse);
         }
-
-//        if (requestUri.startsWith(UrlPath.PATIENT_REGISTRATION)
-//            && !isPatientRightLoggedIn(httpRequest)){
-//            chain.doFilter(httpRequest, httpResponse);
-//        }
-//        if ()
-//
-//        if (!isPatientRightLoggedIn(httpRequest)){
-//            chain.doFilter(httpRequest, httpResponse);
-//        }else {
-//            httpResponse.sendRedirect(UrlPath.PATIENT_PATH + "/" + getPatientId(httpRequest) + "/" + UrlPath.DOCTOR_SUBPATH_LOGOUT);
-//        }
     }
 
-    private boolean isPatientRightLoggedIn(HttpServletRequest httpRequest){
+    private boolean isPatientLoggedIn(HttpServletRequest httpRequest){
         PatientDto patientDto = (PatientDto) httpRequest.getSession().getAttribute("PATIENT");
         return patientDto != null && isIdTrue(httpRequest, patientDto.getId());
     }
-
-//    private Long getPatientId(HttpServletRequest httpRequest){
-//        String[] requestPathParts = httpRequest.getPathInfo().split("/");
-//        return Long.parseLong(requestPathParts[2]);
-//    }
 
     private boolean isIdTrue(HttpServletRequest httpRequest, Long idInSession){
         String[] requestPathParts = httpRequest.getPathInfo().split("/");

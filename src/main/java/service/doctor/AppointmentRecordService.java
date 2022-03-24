@@ -51,6 +51,6 @@ public class AppointmentRecordService {
 
     private Long extractAppointmentRecordIdFromRequest(HttpServletRequest request){
         String[] requestPathParts = request.getPathInfo().split("/");
-        return Long.parseLong(requestPathParts[5]);  // 0-""/ 1-"doctor"/ 2-"patients"/ 3-"{some id}"/ 4-"records/ 5-"{some record-id}"
+        return Long.parseLong(requestPathParts[6]);  // 0-""/ 1-"doctor"/ 2-{id}/ 3-"patients"/ 4-{id}/ 5-"records/ 6-"{id}"
     }
 }

@@ -5,7 +5,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class RegistrationLocalDateValidator implements ConstraintValidator<DoctorMiddleNameConstraint, LocalDate> {
+public class RegistrationLocalDateValidator implements ConstraintValidator<RegistrationLocalDateConstraint, LocalDate> {
 
     @Override
     public boolean isValid(LocalDate value, ConstraintValidatorContext context) {

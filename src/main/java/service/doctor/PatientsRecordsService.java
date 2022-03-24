@@ -36,7 +36,7 @@ public class PatientsRecordsService {
             if (patient.isPresent()){
                 List<AppointmentRecord> patientsRecords = patient.get().getPatientsRecords();
                 List<AppointmentRecordDto> dtoRecordsList = new ArrayList<>();
-                patientsRecords.stream().forEach(record -> dtoRecordsList.add(appointmentRecordDtoMapper.mapFrom(record)));
+                patientsRecords.forEach(record -> dtoRecordsList.add(appointmentRecordDtoMapper.mapFrom(record)));
                 session.getTransaction().commit();
                 return dtoRecordsList;
             }else new PageNotFoundException();
@@ -49,6 +49,6 @@ public class PatientsRecordsService {
 
     private Long extractPatientIdFromRequest(HttpServletRequest request){
         String[] requestPathParts = request.getPathInfo().split("/");
-        return Long.parseLong(requestPathParts[3]);       // 0-""/ 1-"doctor"/ 2-"patients"/ 3-"{some id}"/...
+        return Long.parseLong(requestPathParts[4]);       // 0-""/ 1-"doctor"/ 2-{id}/ 3-"patients"/ 4-"{some id}"/...
     }
 }

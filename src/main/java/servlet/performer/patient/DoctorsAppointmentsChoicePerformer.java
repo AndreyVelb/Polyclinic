@@ -5,9 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import service.dto.doctor.DoctorDto;
-import service.patient.DoctorInfoService;
-import servlet.converter.response.DoctorDtoConverter;
+import service.dto.patient.DocAppForPatientDto;
+import service.patient.DoctorsAppointmentsService;
+import servlet.converter.response.DocAppDtoListForPatientConverter;
 import servlet.performer.Performer;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
@@ -15,23 +15,25 @@ import util.UrlPath;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Set;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 /**
- *      /patient/{id}/doctors/{id}
+ *      /patient/{id}/doctors/{id}/appointments
  */
 
 @RequiredArgsConstructor
-public class DoctorInfoPerformer implements Performer {
+public class DoctorsAppointmentsChoicePerformer implements Performer {
     private static final String path = UrlPath.PATIENT_PATH;
     private static final String doctorsSubPath = UrlPath.PATIENT_SUBPATH_DOCTORS;
+    private static final String appointmentsSubPath = UrlPath.PATIENT_SUBPATH_DOCTORS_APPOINTMENTS;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
-    private final DoctorInfoService service;
+    private final DoctorsAppointmentsService service;
 
-    private final DoctorDtoConverter doctorDtoConverter;
+    private final DocAppDtoListForPatientConverter docAppDtoListConverter;
 
 
     @Override
@@ -44,9 +46,9 @@ public class DoctorInfoPerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        DoctorDto doctorDto = service.getDoctorDto(request);
-        String doctorDtoAsJson = doctorDtoConverter.convert(doctorDto);
-        new JsonResponse().send(writer, response, doctorDtoAsJson, SC_OK);
+        List<DocAppForPatientDto> docAppDtoList = service.getVacantDoctorsAppointments(request);
+        String docAppDtoListAsJson = docAppDtoListConverter.convert(docAppDtoList);
+        new JsonResponse().send(writer, response, docAppDtoListAsJson, SC_OK);
     }
 
     @Override
@@ -64,10 +66,11 @@ public class DoctorInfoPerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            return requestPathParts.length == 5
+            return requestPathParts.length == 6
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(doctorsSubPath)
-                    && requestPathParts[4].matches("[1-90]+");  // 0-""/ 1-"patient"/ 2-{id}/ 3-"doctors"/ 4-{id}
+                    && requestPathParts[4].matches("[1-90]+")
+                    && requestPathParts[5].matches(appointmentsSubPath);        // 0-""/ 1-"patient"/ 2-{id}/ 3-"doctors"/ 4-{id}/ 5-"appointments"
         }else return false;
     }
 }

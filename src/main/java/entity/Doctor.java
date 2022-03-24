@@ -45,15 +45,6 @@ public class Doctor implements BaseEntity<Long> {
     @ColumnTransformer(write = "crypt(?, gen_salt('bf'))")
     private String password;
 
-//    @OneToOne(mappedBy = "doctor", cascade = CascadeType.ALL, optional = false)
-//    private WorkSchedule schedule;
-
     @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AppointmentRecord> recordsWrittenByDoctor;
-
-//    public void setSchedule(WorkSchedule schedule){
-//        schedule.setDoctor(this);
-//        this.schedule = schedule;
-//    }
-
 }
