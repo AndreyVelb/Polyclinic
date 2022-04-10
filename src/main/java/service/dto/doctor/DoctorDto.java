@@ -2,7 +2,11 @@ package service.dto.doctor;
 
 import entity.DoctorSpeciality;
 import entity.Qualification;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import service.dto.Dto;
 
 @AllArgsConstructor
@@ -11,16 +15,16 @@ import service.dto.Dto;
 @Builder
 public class DoctorDto implements Dto {
 
-    Long id;
+    private Long id;
 
-    String lastName;
+    private String lastName;
 
-    String firstName;
+    private String firstName;
 
-    String middleName;
+    private String middleName;
 
-    Qualification qualification;
+    private Qualification qualification;
 
-    DoctorSpeciality speciality;
+    private DoctorSpeciality speciality;
 
 }

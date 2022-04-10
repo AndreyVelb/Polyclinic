@@ -3,69 +3,51 @@ package service.admin;
 import entity.Doctor;
 import entity.WorkSchedule;
 import exception.UserAlreadyExistsException;
-import exception.DtoValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import repository.DoctorRepository;
 import repository.WorkScheduleRepository;
+import service.Mapper;
 import service.dto.admin.DoctorRegistrationDto;
-import service.dto.doctor.DoctorDto;
 import service.dto.validator.DtoValidator;
-import service.mapper.DoctorDtoMapper;
-import service.mapper.DoctorMapper;
-import servlet.converter.request.RegistrationDoctorConverter;
 import util.SessionPool;
-
-import javax.validation.ConstraintViolationException;
 
 @RequiredArgsConstructor
 public class DoctorRegistrationService {
     private final DoctorRepository doctorRepository;
     private final WorkScheduleRepository workScheduleRepository;
 
-    private final RegistrationDoctorConverter registrationDoctorConverter;
-    private final DoctorMapper doctorMapper;
-    private final DoctorDtoMapper doctorDtoMapper;
+    private final ObjectMapper objectMapper;
+
+    private final Mapper mapper;
 
     private final DtoValidator dtoValidator;
 
     @SneakyThrows
-    public DoctorDto registration(HttpServletRequest request) {
+    public Long registration(HttpServletRequest request) {
         Session session = SessionPool.getSession();
-        DoctorRegistrationDto doctorRegistrationDto = registrationDoctorConverter.convert(request);
-        Doctor doctor = createDoctor(doctorRegistrationDto);
-        WorkSchedule workSchedule = createSchedule(doctorRegistrationDto, doctor);
+        DoctorRegistrationDto doctorRegistrationDto = objectMapper.readValue(request.getInputStream(), DoctorRegistrationDto.class);
+        dtoValidator.validate(doctorRegistrationDto);
+        Doctor doctor = mapper.mapToDoctor(doctorRegistrationDto);
+        WorkSchedule workSchedule = doctorRegistrationDto.getSchedule();
+        workSchedule.setDoctor(doctor);
         try {
             session.beginTransaction();
-
-            if( doctorRepository.registerDoctor(doctor, session)) {
+            if (doctorRepository.findByLogin(doctor.getLogin(), session).isEmpty()){
+                Long doctorId = doctorRepository.registerDoctor(doctor, session);
                 workScheduleRepository.save(workSchedule, session);
-                Doctor registeredDoctor = doctorRepository.findByLogin(doctor.getLogin(), session).get();
                 session.getTransaction().commit();
-                return doctorDtoMapper.mapFrom(registeredDoctor);
-            }else throw new UserAlreadyExistsException();
+                return doctorId;
+            } else {
+                throw new UserAlreadyExistsException();
+            }
         }catch (Exception exception){
             session.getTransaction().rollback();
             throw exception;
         }
     }
 
-    @SneakyThrows
-    private Doctor createDoctor(DoctorRegistrationDto registrationDto) {
-        try {
-            dtoValidator.isValid(registrationDto);
-            return doctorMapper.mapFrom(registrationDto);
-
-        }catch (ConstraintViolationException exception){
-            throw new DtoValidationException(exception);
-        }
-    }
-
-    private WorkSchedule createSchedule(DoctorRegistrationDto registrationDto, Doctor doctor){
-        WorkSchedule workSchedule = registrationDto.getSchedule();
-        workSchedule.setDoctor(doctor);
-        return workSchedule;
-    }
 }

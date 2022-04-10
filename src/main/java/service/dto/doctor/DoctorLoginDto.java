@@ -1,6 +1,8 @@
 package service.dto.doctor;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import service.dto.Dto;
 
 @AllArgsConstructor
@@ -8,7 +10,7 @@ import service.dto.Dto;
 @Data
 public class DoctorLoginDto implements Dto {
 
-    String login;
+    private String login;
 
-    String password;
+    private String password;
 }

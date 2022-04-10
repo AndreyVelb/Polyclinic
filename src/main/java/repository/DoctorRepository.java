@@ -2,11 +2,11 @@ package repository;
 
 import entity.Doctor;
 import entity.DoctorSpeciality;
-import entity.Patient;
+import exception.NotFoundException;
 import exception.ServerTechnicalProblemsException;
+import exception.UserAlreadyExistsException;
 import org.hibernate.Session;
 
-import javax.print.Doc;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,14 +17,9 @@ public class DoctorRepository extends AbstractRepository<Long, Doctor>{
         super(Doctor.class);
     }
 
-    public boolean registerDoctor(Doctor doctor, Session session) throws ServerTechnicalProblemsException {
+    public Long registerDoctor(Doctor doctor, Session session) throws ServerTechnicalProblemsException {
         try {
-            session.createNativeQuery("LOCK TABLE doctors IN ROW EXCLUSIVE MODE").executeUpdate();
-            if((findByLogin(doctor.getLogin(), session).isEmpty())){
-                session.save(doctor);
-                session.flush();
-                return true;
-            } else return false;
+            return (Long) session.save(doctor);
         } catch (Exception e){
             throw new ServerTechnicalProblemsException();
         }

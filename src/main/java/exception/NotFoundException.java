@@ -1,14 +1,7 @@
 package exception;
 
-public class NotFoundException extends Exception{
-    private final String message;
-
+public class NotFoundException extends RuntimeException{
     public NotFoundException() {
-        this.message = "К сожалению по вашему запросу ничего не найдено";
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        super("К сожалению по вашему запросу ничего не найдено");
     }
 }

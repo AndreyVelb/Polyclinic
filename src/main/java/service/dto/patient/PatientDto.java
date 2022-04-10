@@ -1,8 +1,12 @@
 package service.dto.patient;
 
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import servlet.converter.serializer.LocalDateSerializer;
+import service.dto.serializer.LocalDateSerializer;
 import service.dto.Dto;
 
 import java.time.LocalDate;
@@ -14,14 +18,14 @@ import java.time.LocalDate;
 @Builder
 public class PatientDto implements Dto {
 
-    Long id;
+    private Long id;
 
-    String lastName;
+    private String lastName;
 
-    String firstName;
+    private String firstName;
 
-    String middleName;
+    private String middleName;
 
     @JsonSerialize(using = LocalDateSerializer.class)
-    LocalDate birthDate;
+    private LocalDate birthDate;
 }

@@ -1,14 +1,7 @@
 package exception;
 
-public class MethodNotAllowedException extends Exception{
-    private final String message;
-
+public class MethodNotAllowedException extends RuntimeException{
     public MethodNotAllowedException() {
-        this.message = "";
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        super();
     }
 }

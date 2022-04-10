@@ -1,23 +1,29 @@
 package servlet.performer.doctor;
 
-import exception.*;
+
+import exception.DtoValidationException;
+import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import service.doctor.AppointmentRecordService;
 import service.dto.doctor.AppointmentRecordDto;
-import servlet.converter.response.AppointmentRecordConverter;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /doctor/{id}/patients/{id}/records/{id}
@@ -31,11 +37,12 @@ public class AppointmentRecordPerformer implements Performer {
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET);
 
     private final AppointmentRecordService service;
-    private final AppointmentRecordConverter appointmentRecordConverter;
+
+    private final ObjectMapper objectMapper;
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         if (request.getMethod().equals(HttpMethod.GET)){
             performGET(writer, request, response);
         }else throw new MethodNotAllowedException();
@@ -43,9 +50,16 @@ public class AppointmentRecordPerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        AppointmentRecordDto appointmentRecordDto = service.getAppointmentRecordDto(request);
-        String json = appointmentRecordConverter.convert(appointmentRecordDto);
-        new JsonResponse().send(writer, response, json, SC_OK);
+        try {
+            AppointmentRecordDto appointmentRecordDto = service.getAppointmentRecordDto(request);
+            String json = objectMapper.writeValueAsString(appointmentRecordDto);
+            new JsonResponse().send(writer, response, json, SC_OK);
+        } catch (UserAlreadyExistsException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        }
     }
 
     @Override
@@ -63,7 +77,6 @@ public class AppointmentRecordPerformer implements Performer {
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-
             return requestPathParts.length == 7
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(patientsSubPath)

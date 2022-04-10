@@ -2,13 +2,11 @@ package servlet.response;
 
 import jakarta.servlet.http.HttpServletResponse;
 import service.dto.patient.PatientDto;
-
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
-public class PatientRegistrationResponse implements ResponseInterface<PatientDto>{
+public class PatientRegistrationResponse {
 
-    @Override
     public void send(PrintWriter writer, HttpServletResponse response, PatientDto patientDto, int code) {
         createResponse(writer, response, patientDto, code);
     }

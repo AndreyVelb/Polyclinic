@@ -1,23 +1,28 @@
 package servlet.performer.patient;
 
-import exception.*;
+import exception.DtoValidationException;
+import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import service.dto.doctor.DoctorDto;
 import service.patient.DoctorInfoService;
-import servlet.converter.response.DoctorDtoConverter;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /patient/{id}/doctors/{id}
@@ -31,12 +36,12 @@ public class DoctorInfoPerformer implements Performer {
 
     private final DoctorInfoService service;
 
-    private final DoctorDtoConverter doctorDtoConverter;
+    private final ObjectMapper objectMapper;
 
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         if (request.getMethod().equals(HttpMethod.GET)){
             performGET(writer, request, response);
         }else throw new MethodNotAllowedException();
@@ -44,9 +49,16 @@ public class DoctorInfoPerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        DoctorDto doctorDto = service.getDoctorDto(request);
-        String doctorDtoAsJson = doctorDtoConverter.convert(doctorDto);
-        new JsonResponse().send(writer, response, doctorDtoAsJson, SC_OK);
+        try {
+            DoctorDto doctorDto = service.getDoctorDto(request);
+            String doctorDtoAsJson = objectMapper.writeValueAsString(doctorDto);
+            new JsonResponse().send(writer, response, doctorDtoAsJson, SC_OK);
+        } catch (UserAlreadyExistsException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        }
     }
 
     @Override

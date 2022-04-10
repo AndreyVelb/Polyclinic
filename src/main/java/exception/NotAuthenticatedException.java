@@ -1,14 +1,7 @@
 package exception;
 
-public class NotAuthenticatedException extends Exception{
-    private final String message;
-
+public class NotAuthenticatedException extends RuntimeException{
     public NotAuthenticatedException() {
-        this.message = "Вы не прошли аутентификацию. Попробуйте еще раз...";
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        super("Вы не прошли аутентификацию. Попробуйте еще раз...");
     }
 }

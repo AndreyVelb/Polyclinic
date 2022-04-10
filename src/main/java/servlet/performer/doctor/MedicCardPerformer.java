@@ -1,17 +1,19 @@
 package servlet.performer.doctor;
 
-import exception.UserAlreadyExistsException;
+import exception.DtoValidationException;
 import exception.MethodNotAllowedException;
 import exception.NotAuthenticatedException;
 import exception.ServerTechnicalProblemsException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import service.doctor.MedicCardService;
 import service.dto.patient.PatientDto;
-import servlet.converter.response.PatientDtoConverter;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
@@ -20,7 +22,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /doctor/{id}/patients/{id}
@@ -34,7 +38,7 @@ public class MedicCardPerformer implements Performer {
 
     private final MedicCardService service;
 
-    private final PatientDtoConverter patientDtoConverter;
+    private final ObjectMapper objectMapper;
 
     @Override
     @SneakyThrows
@@ -46,12 +50,19 @@ public class MedicCardPerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        String[] requestPathParts = request.getPathInfo().split("/");
-        Long patientId =  Long.parseLong(String.valueOf(requestPathParts[4]));
-        PatientDto patientDto = service.getPatientMedicCard(patientId);
-        String json = patientDtoConverter.convert(patientDto);
-        JsonResponse jsonResponse = new JsonResponse();
-        jsonResponse.send(writer, response, json, SC_OK);
+        try {
+            String[] requestPathParts = request.getPathInfo().split("/");
+            Long patientId =  Long.parseLong(String.valueOf(requestPathParts[4]));
+            PatientDto patientDto = service.getPatientMedicCard(patientId);
+            String json = objectMapper.writeValueAsString(patientDto);
+            JsonResponse jsonResponse = new JsonResponse();
+            jsonResponse.send(writer, response, json, SC_OK);
+        } catch (UserAlreadyExistsException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        }
     }
 
     @Override

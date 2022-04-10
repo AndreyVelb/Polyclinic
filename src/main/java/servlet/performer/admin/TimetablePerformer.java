@@ -1,14 +1,18 @@
 package servlet.performer.admin;
 
+import exception.DtoValidationException;
 import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import service.admin.TimetableService;
 import service.dto.admin.DocAppForAdminDto;
-import servlet.converter.response.DocAppDtoListForAdminConverter;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
@@ -17,7 +21,9 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /admin/{id}/timetable
@@ -31,21 +37,28 @@ public class TimetablePerformer implements Performer {
 
     private final TimetableService service;
 
-    private final DocAppDtoListForAdminConverter dtoListConverter;
+    private final ObjectMapper objectMapper;
 
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         if (request.getMethod().equals(HttpMethod.GET)) {
-            performGET(writer, request, response);
+            performGET(writer, response);
         } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        List<DocAppForAdminDto> timetableAsDto = service.getAllTimetable();
-        String timetableAsJson = dtoListConverter.convert(timetableAsDto);
-        new JsonResponse().send(writer, response, timetableAsJson, SC_OK);
+    private void performGET(PrintWriter writer, HttpServletResponse response) {
+        try {
+            List<DocAppForAdminDto> timetableAsDto = service.getAllTimetable();
+            String timetableAsJson = objectMapper.writeValueAsString(timetableAsDto);
+            new JsonResponse().send(writer, response, timetableAsJson, SC_OK);
+        } catch (UserAlreadyExistsException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        }
     }
 
     @Override

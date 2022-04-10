@@ -1,6 +1,10 @@
 package servlet.performer.patient;
 
+import exception.AlreadyBookedException;
+import exception.DtoValidationException;
 import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -8,15 +12,19 @@ import lombok.SneakyThrows;
 import service.dto.patient.PatientDto;
 import service.patient.PatientRegistrationService;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import servlet.response.PatientRegistrationResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
+import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /join
@@ -39,8 +47,18 @@ public class PatientRegistrationPerformer implements Performer {
 
     @SneakyThrows
     private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        PatientDto patientDto = service.registration(request);
-        new PatientRegistrationResponse().send(writer, response, patientDto, SC_CREATED);
+        try {
+            PatientDto patientDto = service.registration(request);
+            new PatientRegistrationResponse().send(writer, response, patientDto, SC_CREATED);
+        } catch (UserAlreadyExistsException
+                | ConstraintViolationException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        } catch (AlreadyBookedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_CONFLICT);
+        }
     }
 
     @Override

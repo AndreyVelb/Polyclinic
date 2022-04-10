@@ -3,24 +3,23 @@ package service.patient;
 import entity.DoctorsAppointment;
 import entity.Patient;
 import exception.NotFoundException;
+import exception.PatientNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.DoctorsAppointmentRepository;
 import repository.PatientRepository;
+import service.Mapper;
 import service.dto.patient.DocAppForPatientDto;
-import service.mapper.DocAppDtoForPatientMapper;
 import util.SessionPool;
-
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public class BookingDoctorsAppointmentService {
     private final DoctorsAppointmentRepository doctorsAppointmentRepository;
     private final PatientRepository patientRepository;
 
-    private final DocAppDtoForPatientMapper docAppDtoMapper;
+    private final Mapper mapper;
 
     @SneakyThrows
     public DocAppForPatientDto getDoctorsAppointment(HttpServletRequest request){
@@ -28,14 +27,9 @@ public class BookingDoctorsAppointmentService {
         Long docAppId = extractDoctorsAppointmentIdFromRequest(request);
         try {
             session.beginTransaction();
-            Optional<DoctorsAppointment> mayBeDocApp = doctorsAppointmentRepository.findById(docAppId, session);
+            DoctorsAppointment doctorAppointment = doctorsAppointmentRepository.findById(docAppId, session).orElseThrow(NotFoundException::new);
             session.getTransaction().commit();
-            if (mayBeDocApp.isPresent()){
-                return docAppDtoMapper.mapFrom(mayBeDocApp.get());
-            } else {
-                session.getTransaction().rollback();
-                throw new NotFoundException();
-            }
+            return mapper.mapToDocAppForPatientDto(doctorAppointment);
         } catch (Exception exception){
             session.getTransaction().rollback();
             throw exception;
@@ -49,7 +43,7 @@ public class BookingDoctorsAppointmentService {
         Long docAppId = extractDoctorsAppointmentIdFromRequest(request);
         try {
             session.beginTransaction();
-            Patient patient = (patientRepository.findById(patientId, session)).get();
+            Patient patient = (patientRepository.findById(patientId, session)).orElseThrow(PatientNotFoundException::new);
             doctorsAppointmentRepository.bookDoctorsAppointment(docAppId, patient, session);
             session.getTransaction().commit();
         }catch (Exception exception){

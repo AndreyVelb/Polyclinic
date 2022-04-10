@@ -1,26 +1,34 @@
 package servlet.performer.patient;
 
-import exception.*;
+import exception.AlreadyBookedException;
+import exception.DtoValidationException;
+import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.PageNotFoundException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import service.dto.patient.DocAppForPatientDto;
 import service.patient.BookingDoctorsAppointmentService;
-import servlet.converter.response.DocAppDtoForPatientConverter;
-import servlet.converter.response.InfoConverter;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
 import javax.persistence.OptimisticLockException;
-import java.io.IOException;
+import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /patient/{id}/doctors/{id}/appointments/{id}
@@ -35,12 +43,11 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
 
     private final BookingDoctorsAppointmentService service;
 
-    private final DocAppDtoForPatientConverter docAppDtoConverter;
-    private final InfoConverter infoConverter;
+    private final ObjectMapper objectMapper;
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         if (request.getMethod().equals(HttpMethod.GET)){
             performGET(writer, request, response);
         }
@@ -52,19 +59,35 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        DocAppForPatientDto dto = service.getDoctorsAppointment(request);
-        String docAppDtoAsJson = docAppDtoConverter.convert(dto);
-        new JsonResponse().send(writer, response, docAppDtoAsJson, SC_OK);
+        try {
+            DocAppForPatientDto dto = service.getDoctorsAppointment(request);
+            String docAppDtoAsJson = objectMapper.writeValueAsString(dto);
+            new JsonResponse().send(writer, response, docAppDtoAsJson, SC_OK);
+        } catch (UserAlreadyExistsException
+                | DtoValidationException
+                | PageNotFoundException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        }
     }
 
     @SneakyThrows
     private void performPUT(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
         try {
             service.bookDoctorsAppointment(request);
-        }catch (OptimisticLockException exception){
-            throw new AlreadyBookedException();
+        } catch (OptimisticLockException exception){
+            new ExceptionResponse().send(response.getWriter(), response, new AlreadyBookedException(), SC_CONFLICT);
+        } catch (UserAlreadyExistsException
+                | ConstraintViolationException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        } catch (AlreadyBookedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_CONFLICT);
         }
-        String json = infoConverter.convert("Вы успешно забронировали это время приема");
+        String json = objectMapper.writeValueAsString("Вы успешно забронировали это время приема");
         new JsonResponse().send(writer, response, json, SC_CREATED);
     }
 

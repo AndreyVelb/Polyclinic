@@ -1,7 +1,5 @@
 package service.dto.doctor;
 
-import entity.Doctor;
-import entity.Patient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import service.dto.Dto;
 import service.dto.patient.PatientDto;
-import servlet.converter.serializer.LocalDateSerializer;
+import service.dto.serializer.LocalDateSerializer;
 
 import java.time.LocalDate;
 
@@ -19,17 +17,17 @@ import java.time.LocalDate;
 @Builder
 public class AppointmentRecordDto implements Dto {
 
-    Long id;
+    private Long id;
 
-    PatientDto patientDto;
+    private PatientDto patientDto;
 
-    DoctorDto doctorDto;
+    private DoctorDto doctorDto;
 
     @JsonSerialize(using = LocalDateSerializer.class)
-    LocalDate visitDate;
+    private LocalDate visitDate;
 
-    String healthComplaints;
+    private String healthComplaints;
 
-    String doctorsRecommendation;
+    private String doctorsRecommendation;
 
 }

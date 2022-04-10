@@ -1,16 +1,27 @@
 package entity;
 
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnTransformer;
-
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
 
 @Entity
-@Data
-@EqualsAndHashCode(exclude = {"recordsWrittenByDoctor"})
-@ToString(exclude = {"recordsWrittenByDoctor"})
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -45,6 +56,8 @@ public class Doctor implements BaseEntity<Long> {
     @ColumnTransformer(write = "crypt(?, gen_salt('bf'))")
     private String password;
 
-    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<AppointmentRecord> recordsWrittenByDoctor;
+
 }

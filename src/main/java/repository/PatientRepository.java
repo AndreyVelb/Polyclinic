@@ -1,8 +1,8 @@
 package repository;
 
 import entity.Patient;
-import org.hibernate.Session;
 import exception.ServerTechnicalProblemsException;
+import org.hibernate.Session;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

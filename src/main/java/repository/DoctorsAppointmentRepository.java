@@ -6,8 +6,6 @@ import exception.NotFoundException;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 
-import javax.persistence.EntityNotFoundException;
-import javax.print.Doc;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

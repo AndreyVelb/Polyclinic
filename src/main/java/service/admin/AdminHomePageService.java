@@ -2,8 +2,6 @@ package service.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
-import repository.DoctorRepository;
-import repository.PatientRepository;
 import repository.Repository;
 import util.SessionPool;
 

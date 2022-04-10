@@ -12,8 +12,8 @@ import service.dto.Dto;
 @Builder
 public class AdminStatisticsDto implements Dto {
 
-    int patientCount;
+    private int patientCount;
 
-    int doctorCount;
+    private int doctorCount;
 
 }

@@ -2,8 +2,6 @@ package entity;
 
 import org.codehaus.jackson.annotate.JsonValue;
 
-import javax.persistence.criteria.CriteriaBuilder;
-
 public enum Qualification {
     FIRST(1),
     SECOND(2),
@@ -12,7 +10,7 @@ public enum Qualification {
     FIFTH(5),
     SIXTH(6);
 
-    private Integer qualification;
+    private final Integer qualification;
 
     Qualification(Integer qualification){
         this.qualification = qualification;

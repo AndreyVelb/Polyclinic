@@ -1,14 +1,7 @@
 package exception;
 
-public class PageNotFoundException extends Exception{
-    private final String message;
-
+public class PageNotFoundException extends RuntimeException{
     public PageNotFoundException() {
-        this.message = "";
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        super();
     }
 }

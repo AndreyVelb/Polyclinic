@@ -2,7 +2,11 @@ package service.dto.doctor;
 
 import entity.Doctor;
 import entity.Patient;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import service.dto.Dto;
 
 import javax.validation.constraints.NotNull;
@@ -16,19 +20,13 @@ import java.time.LocalDate;
 @Builder
 public class AppointmentRecordSavedDto implements Dto {
 
-    Patient patient;
+    private Patient patient;
 
-    Doctor doctor;
+    private Doctor doctor;
 
-    LocalDate visitDate;
+    private LocalDate visitDate;
 
-    @NotNull(message = "Поле ЖАЛОБЫ ПАЦИЕНТА не должно быть пустым")
-    @Size(max = 500, message = "Поле ФАМИЛИЯ не должно превышать 500 символов")
-    @Pattern(regexp = "[а-яА-Я-]+", message = "Поле ФАМИЛИЯ должно быть записано кирилическими буквами")
-    String healthComplaints;
+    private String healthComplaints;
 
-    @NotNull(message = "Поле РЕКОМЕНДАЦИИ ВРАЧА не должно быть пустым")
-    @Size(max = 499, message = "Поле ФАМИЛИЯ не должно превышать 499 символов")
-    @Pattern(regexp = "[а-яА-Я-]+", message = "Поле ФАМИЛИЯ должно быть записано кирилическими буквами")
-    String doctorsRecommendation;
+    private String doctorsRecommendation;
 }

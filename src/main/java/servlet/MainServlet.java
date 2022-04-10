@@ -1,6 +1,12 @@
 package servlet;
 
-import exception.*;
+import exception.AlreadyBookedException;
+import exception.DtoValidationException;
+import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.PageNotFoundException;
+import exception.ServerTechnicalProblemsException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,31 +14,63 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
-import repository.*;
+import repository.AppointmentRecordRepository;
+import repository.DoctorRepository;
+import repository.DoctorsAppointmentRepository;
+import repository.PatientRepository;
+import repository.WorkScheduleRepository;
+import service.Mapper;
 import service.admin.AdminHomePageService;
 import service.admin.DoctorRegistrationService;
 import service.admin.NextWeekTimetableService;
 import service.admin.TimetableService;
-import service.doctor.*;
+import service.doctor.AppointmentRecordCreateService;
+import service.doctor.AppointmentRecordService;
+import service.doctor.DoctorLoginService;
+import service.doctor.MedicCardService;
+import service.doctor.PatientsRecordsService;
+import service.doctor.SearchPatientService;
 import service.dto.validator.DtoValidator;
-import service.mapper.*;
-import service.patient.*;
-import servlet.converter.request.*;
-import servlet.converter.response.*;
-import servlet.performer.admin.*;
-import servlet.performer.doctor.*;
-import servlet.performer.patient.*;
-import servlet.response.ExceptionResponse;
+import service.patient.BookingDoctorsAppointmentService;
+import service.patient.DoctorChoiceService;
+import service.patient.DoctorInfoService;
+import service.patient.DoctorsAppointmentsService;
+import service.patient.PatientLoginService;
+import service.patient.PatientRegistrationService;
 import servlet.performer.Performer;
 import servlet.performer.PerformerDispatcher;
+import servlet.performer.admin.AdminHomePagePerformer;
+import servlet.performer.admin.AdminLogoutPerformer;
+import servlet.performer.admin.DoctorRegistrationPerformer;
+import servlet.performer.admin.NextWeekTimetablePerformer;
+import servlet.performer.admin.TimetablePerformer;
+import servlet.performer.doctor.AppointmentRecordCreatePerformer;
+import servlet.performer.doctor.AppointmentRecordPerformer;
+import servlet.performer.doctor.DoctorLoginPerformer;
+import servlet.performer.doctor.DoctorLogoutPerformer;
+import servlet.performer.doctor.MedicCardPerformer;
+import servlet.performer.doctor.PatientsRecordsPerformer;
+import servlet.performer.doctor.SearchPatientPerformer;
+import servlet.performer.patient.BookingDoctorsAppointmentPerformer;
+import servlet.performer.patient.DoctorChoicePerformer;
+import servlet.performer.patient.DoctorInfoPerformer;
+import servlet.performer.patient.DoctorsAppointmentsChoicePerformer;
+import servlet.performer.patient.PatientLoginPerformer;
+import servlet.performer.patient.PatientLogoutPerformer;
+import servlet.performer.patient.PatientRegistrationPerformer;
+import servlet.response.ExceptionResponse;
 
-import javax.persistence.OptimisticLockException;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static jakarta.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
+import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 @WebServlet("/*")
 public class MainServlet extends HttpServlet {
@@ -51,94 +89,67 @@ public class MainServlet extends HttpServlet {
         DtoValidator dtoValidator = new DtoValidator();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        AppointmentRecordRequestConverter appointmentRecordRequestConverter = new AppointmentRecordRequestConverter(objectMapper);
-        DoctorLoginConverter doctorLoginConverter = new DoctorLoginConverter(objectMapper);
-        PatientLastNameConverter patientLastNameConverter = new PatientLastNameConverter(objectMapper);
-        PatientLoginConverter patientLoginConverter = new PatientLoginConverter(objectMapper);
-        RegistrationPatientConverter registrationPatientConverter = new RegistrationPatientConverter(objectMapper);
-        AppointmentRecordConverter appointmentRecordConverter = new AppointmentRecordConverter(objectMapper);
-        AppointmentRecordDtoListConverter appointmentRecordDtoListConverter = new AppointmentRecordDtoListConverter(objectMapper);
-        PatientDtoConverter patientDtoConverter = new PatientDtoConverter(objectMapper);
-        PatientDtoListConverter patientDtoListConverter = new PatientDtoListConverter(objectMapper);
-        DoctorDtoListConverter doctorDtoListConverter = new DoctorDtoListConverter(objectMapper);
-        DocAppDtoListForAdminConverter docAppDtoListForAdminConverter = new DocAppDtoListForAdminConverter(objectMapper);
-        DocAppDtoListForPatientConverter docAppDtoListForPatientConverter = new DocAppDtoListForPatientConverter(objectMapper);
-        RegistrationDoctorConverter registrationDoctorConverter = new RegistrationDoctorConverter(objectMapper);
-        AdminStatisticsDtoConverter adminStatisticsDtoConverter = new AdminStatisticsDtoConverter(objectMapper);
-        DoctorDtoConverter doctorDtoConverter = new DoctorDtoConverter(objectMapper);
-        DocAppDtoForPatientConverter docAppDtoForPatientConverter = new DocAppDtoForPatientConverter(objectMapper);
-        InfoConverter infoConverter = new InfoConverter(objectMapper);
 
-        DoctorDtoMapper doctorDtoMapper = new DoctorDtoMapper();
-        PatientDtoMapper patientDtoMapper = new PatientDtoMapper();
-        PatientMapper patientMapper = new PatientMapper();
-        AppointmentRecordDtoMapper appointmentRecordDtoMapper = new AppointmentRecordDtoMapper(doctorDtoMapper, patientDtoMapper);
-        AppointmentRecordMapper appointmentRecordMapper = new AppointmentRecordMapper();
-        ScheduleAsMapDtoMapper scheduleAsListDtoMapper = new ScheduleAsMapDtoMapper();
-        DocAppDtoForAdminMapper docAppDtoForAdminMapper = new DocAppDtoForAdminMapper(doctorDtoMapper, patientDtoMapper);
-        DocAppDtoForPatientMapper docAppDtoForPatientMapper = new DocAppDtoForPatientMapper(doctorDtoMapper);
-        DoctorMapper doctorMapper = new DoctorMapper();
+        Mapper mapper = new Mapper();
 
-        AppointmentRecordCreateService appointmentRecordCreateService = new AppointmentRecordCreateService(patientRepository, appointmentRecordRepository, doctorRepository,
-                appointmentRecordRequestConverter, appointmentRecordMapper, appointmentRecordDtoMapper, dtoValidator);
-        AppointmentRecordService appointmentRecordService = new AppointmentRecordService(appointmentRecordRepository, appointmentRecordDtoMapper);
-        DoctorLoginService doctorLoginService = new DoctorLoginService(doctorRepository, doctorLoginConverter, doctorDtoMapper);
-        MedicCardService medicCardService = new MedicCardService(patientRepository, patientDtoMapper);
-        PatientsRecordsService patientsRecordsService = new PatientsRecordsService(patientRepository, appointmentRecordDtoMapper);
-        SearchPatientService searchPatientService = new SearchPatientService(patientRepository, patientDtoMapper, dtoValidator);
-        PatientRegistrationService patientRegistrationService = new PatientRegistrationService(patientRepository, registrationPatientConverter, patientMapper, patientDtoMapper, dtoValidator);
-        PatientLoginService patientLoginService = new PatientLoginService(patientRepository, patientLoginConverter, patientDtoMapper);
-        DoctorChoiceService doctorChoiceService = new DoctorChoiceService(doctorRepository, doctorDtoMapper);
-        DoctorInfoService doctorInfoService = new DoctorInfoService(doctorRepository, doctorDtoMapper);
-        DoctorsAppointmentsService doctorsAppointmentsService = new DoctorsAppointmentsService(doctorsAppointmentRepository, docAppDtoForPatientMapper);
-        BookingDoctorsAppointmentService bookingDoctorsAppointmentService = new BookingDoctorsAppointmentService(doctorsAppointmentRepository, patientRepository, docAppDtoForPatientMapper);
+        AppointmentRecordCreateService appointmentRecordCreateService = new AppointmentRecordCreateService(patientRepository, appointmentRecordRepository,
+                doctorRepository, dtoValidator);
+        AppointmentRecordService appointmentRecordService = new AppointmentRecordService(appointmentRecordRepository, mapper);
+        DoctorLoginService doctorLoginService = new DoctorLoginService(doctorRepository, objectMapper, mapper);
+        MedicCardService medicCardService = new MedicCardService(patientRepository, mapper);
+        PatientsRecordsService patientsRecordsService = new PatientsRecordsService(patientRepository, mapper);
+        SearchPatientService searchPatientService = new SearchPatientService(patientRepository, mapper, dtoValidator);
+        PatientRegistrationService patientRegistrationService = new PatientRegistrationService(patientRepository, objectMapper, mapper, dtoValidator);
+        PatientLoginService patientLoginService = new PatientLoginService(patientRepository, objectMapper, mapper);
+        DoctorChoiceService doctorChoiceService = new DoctorChoiceService(doctorRepository, mapper);
+        DoctorInfoService doctorInfoService = new DoctorInfoService(doctorRepository, mapper);
+        DoctorsAppointmentsService doctorsAppointmentsService = new DoctorsAppointmentsService(doctorsAppointmentRepository, mapper);
+        BookingDoctorsAppointmentService bookingDoctorsAppointmentService = new BookingDoctorsAppointmentService(doctorsAppointmentRepository, patientRepository, mapper);
         AdminHomePageService adminHomePageService = new AdminHomePageService();
-        DoctorRegistrationService doctorRegistrationService = new DoctorRegistrationService(doctorRepository, workScheduleRepository, registrationDoctorConverter,
-                doctorMapper, doctorDtoMapper, dtoValidator);
-        NextWeekTimetableService nextWeekTimetableService = new NextWeekTimetableService(doctorRepository, doctorsAppointmentRepository, workScheduleRepository, scheduleAsListDtoMapper);
-        TimetableService timetableService = new TimetableService(doctorsAppointmentRepository, docAppDtoForAdminMapper);
+        DoctorRegistrationService doctorRegistrationService = new DoctorRegistrationService(doctorRepository, workScheduleRepository, objectMapper, mapper, dtoValidator);
+        NextWeekTimetableService nextWeekTimetableService = new NextWeekTimetableService(doctorsAppointmentRepository, workScheduleRepository, mapper);
+        TimetableService timetableService = new TimetableService(doctorsAppointmentRepository, mapper);
 
-
-        AppointmentRecordCreatePerformer appointmentRecordCreatePerformer = new AppointmentRecordCreatePerformer(appointmentRecordCreateService);
-        AppointmentRecordPerformer appointmentRecordPerformer = new AppointmentRecordPerformer(appointmentRecordService, appointmentRecordConverter);
+        AppointmentRecordCreatePerformer appointmentRecordCreatePerformer = new AppointmentRecordCreatePerformer(appointmentRecordCreateService, objectMapper);
+        AppointmentRecordPerformer appointmentRecordPerformer = new AppointmentRecordPerformer(appointmentRecordService, objectMapper);
         DoctorLoginPerformer doctorLoginPerformer = new DoctorLoginPerformer(doctorLoginService);
         DoctorLogoutPerformer doctorLogoutPerformer = new DoctorLogoutPerformer();
-        MedicCardPerformer medicCardPerformer = new MedicCardPerformer(medicCardService, patientDtoConverter);
-        PatientsRecordsPerformer patientsRecordsPerformer = new PatientsRecordsPerformer(patientsRecordsService, appointmentRecordDtoListConverter);
-        SearchPatientPerformer searchPatientPerformer = new SearchPatientPerformer(searchPatientService, patientDtoListConverter);
+        MedicCardPerformer medicCardPerformer = new MedicCardPerformer(medicCardService, objectMapper);
+        PatientsRecordsPerformer patientsRecordsPerformer = new PatientsRecordsPerformer(patientsRecordsService, objectMapper);
+        SearchPatientPerformer searchPatientPerformer = new SearchPatientPerformer(searchPatientService, objectMapper);
         PatientLoginPerformer patientLoginPerformer = new PatientLoginPerformer(patientLoginService);
-        DoctorChoicePerformer doctorChoicePerformer = new DoctorChoicePerformer(doctorChoiceService, doctorDtoListConverter);
-        DoctorInfoPerformer doctorInfoPerformer = new DoctorInfoPerformer(doctorInfoService, doctorDtoConverter);
-        DoctorsAppointmentsChoicePerformer doctorsAppointmentsPerformer = new DoctorsAppointmentsChoicePerformer(doctorsAppointmentsService, docAppDtoListForPatientConverter);
-        BookingDoctorsAppointmentPerformer bookingDoctorsAppointmentPerformer = new BookingDoctorsAppointmentPerformer(bookingDoctorsAppointmentService, docAppDtoForPatientConverter, infoConverter);
+        DoctorChoicePerformer doctorChoicePerformer = new DoctorChoicePerformer(doctorChoiceService, objectMapper);
+        DoctorInfoPerformer doctorInfoPerformer = new DoctorInfoPerformer(doctorInfoService, objectMapper);
+        DoctorsAppointmentsChoicePerformer doctorsAppointmentsPerformer = new DoctorsAppointmentsChoicePerformer(doctorsAppointmentsService, objectMapper);
+        BookingDoctorsAppointmentPerformer bookingDoctorsAppointmentPerformer = new BookingDoctorsAppointmentPerformer(bookingDoctorsAppointmentService, objectMapper);
         PatientLogoutPerformer patientLogoutPerformer = new PatientLogoutPerformer();
         PatientRegistrationPerformer patientRegistrationPerformer = new PatientRegistrationPerformer(patientRegistrationService);
-        AdminHomePagePerformer adminHomePagePerformer = new AdminHomePagePerformer(adminHomePageService, patientRepository, doctorRepository, adminStatisticsDtoConverter);
+        AdminHomePagePerformer adminHomePagePerformer = new AdminHomePagePerformer(adminHomePageService, patientRepository, doctorRepository, objectMapper);
         DoctorRegistrationPerformer doctorRegistrationPerformer = new DoctorRegistrationPerformer(doctorRegistrationService);
         NextWeekTimetablePerformer nextWeekTimetablePerformer = new NextWeekTimetablePerformer(nextWeekTimetableService);
-        TimetablePerformer timetablePerformer = new TimetablePerformer(timetableService, docAppDtoListForAdminConverter);
+        TimetablePerformer timetablePerformer = new TimetablePerformer(timetableService, objectMapper);
         AdminLogoutPerformer adminLogoutPerformer = new AdminLogoutPerformer();
 
         List<Performer> allPerformers = List.of(doctorLoginPerformer, searchPatientPerformer,
-                                                medicCardPerformer, appointmentRecordCreatePerformer,
-                                                appointmentRecordPerformer, patientsRecordsPerformer,
-                                                doctorLogoutPerformer, patientRegistrationPerformer,
-                                                patientLoginPerformer, doctorChoicePerformer,
-                                                doctorInfoPerformer, doctorsAppointmentsPerformer,
-                                                bookingDoctorsAppointmentPerformer, patientLogoutPerformer,
-                                                adminHomePagePerformer, doctorRegistrationPerformer,
-                                                nextWeekTimetablePerformer, timetablePerformer,
-                                                adminLogoutPerformer);
+                medicCardPerformer, appointmentRecordCreatePerformer,
+                appointmentRecordPerformer, patientsRecordsPerformer,
+                doctorLogoutPerformer, patientRegistrationPerformer,
+                patientLoginPerformer, doctorChoicePerformer,
+                doctorInfoPerformer, doctorsAppointmentsPerformer,
+                bookingDoctorsAppointmentPerformer, patientLogoutPerformer,
+                adminHomePagePerformer, doctorRegistrationPerformer,
+                nextWeekTimetablePerformer, timetablePerformer,
+                adminLogoutPerformer);
         performerDispatcher = new PerformerDispatcher(doctorLoginPerformer, searchPatientPerformer,
-                                                      medicCardPerformer, appointmentRecordCreatePerformer,
-                                                      appointmentRecordPerformer, patientsRecordsPerformer,
-                                                      doctorLogoutPerformer, patientRegistrationPerformer,
-                                                      patientLoginPerformer, doctorChoicePerformer,
-                                                      doctorInfoPerformer, doctorsAppointmentsPerformer,
-                                                      bookingDoctorsAppointmentPerformer, patientLogoutPerformer,
-                                                      adminHomePagePerformer, doctorRegistrationPerformer,
-                                                      nextWeekTimetablePerformer, timetablePerformer,
-                                                      adminLogoutPerformer, allPerformers);
+                medicCardPerformer, appointmentRecordCreatePerformer,
+                appointmentRecordPerformer, patientsRecordsPerformer,
+                doctorLogoutPerformer, patientRegistrationPerformer,
+                patientLoginPerformer, doctorChoicePerformer,
+                doctorInfoPerformer, doctorsAppointmentsPerformer,
+                bookingDoctorsAppointmentPerformer, patientLogoutPerformer,
+                adminHomePagePerformer, doctorRegistrationPerformer,
+                nextWeekTimetablePerformer, timetablePerformer,
+                adminLogoutPerformer, allPerformers);
     }
 
     @Override
@@ -153,26 +164,19 @@ public class MainServlet extends HttpServlet {
                 } else {
                     throw new MethodNotAllowedException();
                 }
-            }else {
+            } else {
                 throw new PageNotFoundException();
             }
-        }catch (MethodNotAllowedException exception){
+        } catch (MethodNotAllowedException exception) {
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_METHOD_NOT_ALLOWED);
-        }catch (PageNotFoundException exception){
+        } catch (PageNotFoundException exception) {
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_NOT_FOUND);
-        }catch (UserAlreadyExistsException
-                | DtoValidationException exception){
-            new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_BAD_REQUEST);
-        }catch (ServerTechnicalProblemsException exception){
+        } catch (ServerTechnicalProblemsException exception) {
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_INTERNAL_SERVER_ERROR);
-        }catch (NotAuthenticatedException exception){
-            new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_UNAUTHORIZED);
-        }catch (AlreadyBookedException exception){
-            new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_CONFLICT);
         }
     }
 
-        @Override
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             var writer = resp.getWriter();
@@ -181,31 +185,23 @@ public class MainServlet extends HttpServlet {
                 Performer performer = mayBePerformer.get();
                 if (performer.isMethodCanBePerformed(req)) {
                     performer.performAndSendResponse(writer, req, resp);
-                } else{
+                } else {
                     throw new MethodNotAllowedException();
                 }
             } else {
-                throw  new PageNotFoundException();
+                throw new PageNotFoundException();
             }
-        }catch (MethodNotAllowedException exception){
+        } catch (MethodNotAllowedException exception) {
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_METHOD_NOT_ALLOWED);
-        }catch (PageNotFoundException exception){
+        } catch (PageNotFoundException exception) {
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_NOT_FOUND);
-        }catch (UserAlreadyExistsException
-                | ConstraintViolationException
-                | DtoValidationException exception){
-            new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_BAD_REQUEST);
-        }catch (ServerTechnicalProblemsException exception){
+        } catch (ServerTechnicalProblemsException exception) {
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_INTERNAL_SERVER_ERROR);
-        }catch (NotAuthenticatedException exception){
-            new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_UNAUTHORIZED);
-        }catch (AlreadyBookedException exception){
-            new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_CONFLICT);
         }
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             var writer = resp.getWriter();
             Optional<Performer> mayBePerformer = performerDispatcher.definePerformer(req);
@@ -213,26 +209,18 @@ public class MainServlet extends HttpServlet {
                 Performer performer = mayBePerformer.get();
                 if (performer.isMethodCanBePerformed(req)) {
                     performer.performAndSendResponse(writer, req, resp);
-                } else{
+                } else {
                     throw new MethodNotAllowedException();
                 }
             } else {
-                throw  new PageNotFoundException();
+                throw new PageNotFoundException();
             }
-        }catch (MethodNotAllowedException exception){
+        } catch (MethodNotAllowedException exception) {
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_METHOD_NOT_ALLOWED);
-        }catch (PageNotFoundException exception){
+        } catch (PageNotFoundException exception) {
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_NOT_FOUND);
-        }catch (UserAlreadyExistsException
-                | ConstraintViolationException
-                | DtoValidationException exception){
-            new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_BAD_REQUEST);
-        }catch (ServerTechnicalProblemsException exception){
+        } catch (ServerTechnicalProblemsException exception) {
             new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_INTERNAL_SERVER_ERROR);
-        }catch (NotAuthenticatedException exception){
-            new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_UNAUTHORIZED);
-        }catch (AlreadyBookedException exception){
-            new ExceptionResponse().send(resp.getWriter(), resp, exception, SC_CONFLICT);
         }
     }
 }

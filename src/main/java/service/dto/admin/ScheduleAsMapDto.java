@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import service.dto.Dto;
-
 import java.time.DayOfWeek;
-import java.util.HashMap;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -17,8 +15,8 @@ import java.util.Map;
 @Builder
 public class ScheduleAsMapDto implements Dto {
 
-    Doctor doctor;
+    private Doctor doctor;
 
-    Map<DayOfWeek, Boolean> scheduleAsMap;
+    private Map<DayOfWeek, Boolean> scheduleAsMap;
 
 }

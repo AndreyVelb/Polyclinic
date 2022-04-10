@@ -1,14 +1,20 @@
 package servlet.performer.patient;
 
-import exception.*;
+import exception.DtoValidationException;
+import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.PageNotFoundException;
+import exception.ServerTechnicalProblemsException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import service.dto.patient.DocAppForPatientDto;
 import service.patient.DoctorsAppointmentsService;
-import servlet.converter.response.DocAppDtoListForPatientConverter;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
@@ -18,7 +24,9 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /patient/{id}/doctors/{id}/appointments
@@ -33,7 +41,7 @@ public class DoctorsAppointmentsChoicePerformer implements Performer {
 
     private final DoctorsAppointmentsService service;
 
-    private final DocAppDtoListForPatientConverter docAppDtoListConverter;
+    private final ObjectMapper objectMapper;
 
 
     @Override
@@ -46,9 +54,16 @@ public class DoctorsAppointmentsChoicePerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        List<DocAppForPatientDto> docAppDtoList = service.getVacantDoctorsAppointments(request);
-        String docAppDtoListAsJson = docAppDtoListConverter.convert(docAppDtoList);
-        new JsonResponse().send(writer, response, docAppDtoListAsJson, SC_OK);
+        try {
+            List<DocAppForPatientDto> docAppDtoList = service.getVacantDoctorsAppointments(request);
+            String docAppDtoListAsJson = objectMapper.writeValueAsString(docAppDtoList);
+            new JsonResponse().send(writer, response, docAppDtoListAsJson, SC_OK);
+        } catch (UserAlreadyExistsException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        }
     }
 
     @Override

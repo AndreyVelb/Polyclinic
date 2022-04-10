@@ -1,22 +1,32 @@
 package servlet.performer.doctor;
 
-import exception.*;
+import exception.AlreadyBookedException;
+import exception.DtoValidationException;
+import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import service.doctor.AppointmentRecordCreateService;
 import service.dto.doctor.AppointmentRecordDto;
+import service.dto.doctor.AppointmentRecordRequestDto;
 import servlet.performer.Performer;
 import servlet.response.AppointmentRecordCreateResponse;
+import servlet.response.ExceptionResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
-import java.io.IOException;
+import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /doctor/{id}/patients/{id}/writing-record
@@ -31,10 +41,12 @@ public class AppointmentRecordCreatePerformer implements Performer {
 
     private final AppointmentRecordCreateService service;
 
+    private final ObjectMapper objectMapper;
+
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         if (request.getMethod().equals(HttpMethod.POST)){
             performPOST(writer, request, response);
         }else throw new MethodNotAllowedException();
@@ -42,8 +54,20 @@ public class AppointmentRecordCreatePerformer implements Performer {
 
     @SneakyThrows
     private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        AppointmentRecordDto appointmentRecordDto = service.writeAndSaveAppointmentRecord(request);
-        new AppointmentRecordCreateResponse().send(writer, response, appointmentRecordDto, SC_CREATED);
+        try {
+            AppointmentRecordRequestDto appointmentRecordRequestDto = objectMapper.readValue(request.getInputStream(), AppointmentRecordRequestDto.class);
+            Long appRecordId = service.writeAndSaveAppointmentRecord(request, appointmentRecordRequestDto);
+            Long patientId = appointmentRecordRequestDto.getPatientId();
+            new AppointmentRecordCreateResponse().send(writer, response, patientId, appRecordId, SC_CREATED);
+        } catch (UserAlreadyExistsException
+                | ConstraintViolationException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        } catch (AlreadyBookedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_CONFLICT);
+        }
     }
 
     @Override

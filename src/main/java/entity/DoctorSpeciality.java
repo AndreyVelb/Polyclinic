@@ -1,6 +1,5 @@
 package entity;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonValue;
 
 public enum DoctorSpeciality {
@@ -17,7 +16,7 @@ public enum DoctorSpeciality {
 
     NEUROLOGIST("невролог");
 
-    private String speciality;
+    private final String speciality;
 
     DoctorSpeciality(String speciality){
         this.speciality = speciality;

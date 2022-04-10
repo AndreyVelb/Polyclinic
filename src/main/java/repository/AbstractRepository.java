@@ -14,9 +14,9 @@ public abstract class AbstractRepository<K extends Serializable, E extends BaseE
     private final Class<E> clazz;
 
     @Override
-    public E save (E entity, Session session){
-        session.save(entity);
-        return entity;
+    public Long save (E entity, Session session){
+        return (Long) session.save(entity);
+
     }
 
     @Override

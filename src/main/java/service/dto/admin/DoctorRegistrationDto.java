@@ -1,15 +1,14 @@
 package service.dto.admin;
 
 import entity.DoctorSpeciality;
-import entity.WorkSchedule;
 import entity.Qualification;
-import lombok.*;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonValue;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import entity.WorkSchedule;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import service.dto.Dto;
 import service.dto.validator.DoctorMiddleNameConstraint;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -23,33 +22,33 @@ public class DoctorRegistrationDto implements Dto {
     @NotNull(message = "Поле ФАМИЛИЯ не должно быть пустым")
     @Size(max = 20, message = "Поле ФАМИЛИЯ не должно превышать 20 символов")
     @Pattern(regexp = "[а-яА-Я-]+", message = "Поле ФАМИЛИЯ должно быть записано кирилическими буквами")
-    String lastName;
+    private String lastName;
 
     @NotNull(message = "Поле ИМЯ не должно быть пустым")
     @Pattern(regexp = "[а-яА-Я-]+", message = "Поле ИМЯ должно быть записано кирилическими буквами")
     @Size(max = 20, message = "Поле ИМЯ не должно превышать 20 символов")
-    String firstName;
+    private String firstName;
 
     @DoctorMiddleNameConstraint
     @Size(max = 20, message = "Поле ОТЧЕСТВО не должно превышать 20 символов")
-    String middleName;
+    private String middleName;
 
     @NotNull(message = "Поле КВАЛИФИКАЦИЯ не должно быть пустым")
-    Qualification qualification;
+    private Qualification qualification;
 
     @NotNull(message = "Поле СПЕЦИАЛЬНОСТЬ не должно быть пустым")
-    DoctorSpeciality speciality;
+    private DoctorSpeciality speciality;
 
     @NotNull(message = "Поле ЛОГИН не должно быть пустым")
     @Pattern(regexp = "[a-zA-Z01-9]+", message = "Поле ЛОГИН должно быть записано цифрами и(или) латинскими буквами")
     @Size(max = 30, message = "Поле ЛОГИН не должно превышать 30 символов")
-    String login;
+    private String login;
 
     @NotNull(message = "Поле ПАРОЛЬ не должно быть пустым")
     @Pattern(regexp = "[a-zA-Z01-9]+", message = "Поле ПАРОЛЬ должно быть записано цифрами и(или) латинскими буквами")
     @Size(max = 30, message = "Поле ПАРОЛЬ не должно превышать 30 символов")
-    String password;
+    private String password;
 
     @NotNull(message = "Поле ГРАФИК РАБОТЫ не должно быть пустым")
-    WorkSchedule schedule;
+    private WorkSchedule schedule;
 }

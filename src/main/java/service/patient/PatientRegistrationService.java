@@ -1,31 +1,28 @@
 package service.patient;
 
+import entity.Patient;
+import exception.PatientNotFoundException;
+import exception.UserAlreadyExistsException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import exception.UserAlreadyExistsException;
-import exception.DtoValidationException;
-import service.mapper.PatientDtoMapper;
-import service.dto.patient.PatientDto;
-import service.dto.patient.PatientRegistrationDto;
-import entity.Patient;
-import jakarta.servlet.http.HttpServletRequest;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import repository.PatientRepository;
-import service.mapper.PatientMapper;
-import servlet.converter.request.RegistrationPatientConverter;
+import service.Mapper;
+import service.dto.patient.PatientDto;
+import service.dto.patient.PatientRegistrationDto;
 import service.dto.validator.DtoValidator;
 import util.SessionPool;
-
-import javax.validation.ConstraintViolationException;
 
 @RequiredArgsConstructor
 public class PatientRegistrationService {
 
     private final PatientRepository patientRepository;
 
-    private final RegistrationPatientConverter registrationPatientConverter;
-    private final PatientMapper patientMapper;
-    private final PatientDtoMapper patientDtoMapper;
+    private final ObjectMapper objectMapper;
+
+    private final Mapper mapper;
 
     private final DtoValidator dtoValidator;
 
@@ -36,11 +33,12 @@ public class PatientRegistrationService {
         try {
             session.beginTransaction();
             if(patientRepository.registerPatient(patient, session)){
-                Patient registeredPatient = patientRepository.findByLogin(patient.getLogin(), session).get();
+                Patient registeredPatient = patientRepository.findByLogin(patient.getLogin(), session).orElseThrow(PatientNotFoundException::new);
                 session.getTransaction().commit();
-                return patientDtoMapper.mapFrom(registeredPatient);
+                return mapper.mapToPatientDto(registeredPatient);
             }else throw new UserAlreadyExistsException();
-        }catch (Exception exception){
+        }
+        catch (Exception exception){
             session.getTransaction().rollback();
             throw exception;
         }
@@ -48,12 +46,8 @@ public class PatientRegistrationService {
 
     @SneakyThrows
     private Patient createPatient(HttpServletRequest request) {
-        PatientRegistrationDto registrationDto = registrationPatientConverter.convert(request);
-        try {
-            dtoValidator.isValid(registrationDto);
-            return patientMapper.mapFrom(registrationDto);
-        }catch (ConstraintViolationException exception){
-            throw new DtoValidationException(exception);
-        }
+        PatientRegistrationDto registrationDto = objectMapper.readValue(request.getInputStream(), PatientRegistrationDto.class);
+        dtoValidator.validate(registrationDto);
+        return mapper.mapToPatient(registrationDto);
     }
 }

@@ -1,15 +1,17 @@
 package service.doctor;
 
 import entity.Doctor;
+import exception.DoctorNotFoundException;
+import exception.NotAuthenticatedException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import repository.DoctorRepository;
-import lombok.RequiredArgsConstructor;
-import servlet.converter.request.DoctorLoginConverter;
-import service.mapper.DoctorDtoMapper;
-import service.dto.doctor.DoctorLoginDto;
+import service.Mapper;
 import service.dto.doctor.DoctorDto;
+import service.dto.doctor.DoctorLoginDto;
 import util.SessionPool;
 
 import java.util.Optional;
@@ -19,22 +21,22 @@ public class DoctorLoginService {
 
     private final DoctorRepository doctorRepository;
 
-    private final DoctorLoginConverter doctorLoginConverter;
-    private final DoctorDtoMapper doctorDtoMapper;
+    private final ObjectMapper objectMapper;
+
+    private final Mapper mapper;
 
     @SneakyThrows
-    public Optional<DoctorDto> authenticate(HttpServletRequest request) {
+    public DoctorDto authenticate(HttpServletRequest request) {
         Session session = SessionPool.getSession();
-        DoctorLoginDto doctorLoginDto = doctorLoginConverter.convert(request);
+        DoctorLoginDto doctorLoginDto = objectMapper.readValue(request.getInputStream(), DoctorLoginDto.class);
         session.beginTransaction();
-        Optional<Doctor> mayBeDoctor = doctorRepository.authenticate(doctorLoginDto.getLogin(), doctorLoginDto.getPassword(), session);
-        if (mayBeDoctor.isPresent()){
-            DoctorDto doctorDto = doctorDtoMapper.mapFrom(mayBeDoctor.get());
+        try {
+            Doctor doctor = doctorRepository.authenticate(doctorLoginDto.getLogin(), doctorLoginDto.getPassword(), session).orElseThrow(NotAuthenticatedException::new);
             session.getTransaction().commit();
-            return Optional.of(doctorDto);
-        } else {
+            return mapper.mapToDoctorDto(doctor);
+        } catch (Exception exception){
             session.getTransaction().rollback();
-            return Optional.empty();
+            throw exception;
         }
     }
 }

@@ -7,44 +7,37 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
-import repository.AppointmentRecordRepository;
-import repository.DoctorRepository;
 import repository.PatientRepository;
+import service.Mapper;
 import service.dto.doctor.AppointmentRecordDto;
-import service.mapper.AppointmentRecordDtoMapper;
-import service.mapper.AppointmentRecordMapper;
-import service.mapper.DoctorDtoMapper;
-import servlet.converter.request.AppointmentRecordRequestConverter;
 import util.SessionPool;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class PatientsRecordsService {
 
     private final PatientRepository patientRepository;
 
-    private final AppointmentRecordDtoMapper appointmentRecordDtoMapper;
+    private final Mapper mapper;
 
     @SneakyThrows
     public List<AppointmentRecordDto> getPatientsRecordsDto(HttpServletRequest request){
         Session session = SessionPool.getSession();
         Long id = extractPatientIdFromRequest(request);
+        session.beginTransaction();
         try {
-            session.beginTransaction();
-            Optional<Patient> patient = patientRepository.findById(id, session);
-            if (patient.isPresent()){
-                List<AppointmentRecord> patientsRecords = patient.get().getPatientsRecords();
-                List<AppointmentRecordDto> dtoRecordsList = new ArrayList<>();
-                patientsRecords.forEach(record -> dtoRecordsList.add(appointmentRecordDtoMapper.mapFrom(record)));
-                session.getTransaction().commit();
-                return dtoRecordsList;
-            }else new PageNotFoundException();
-        }catch (Exception exception){
+            Patient patient = patientRepository.findById(id, session).orElseThrow(PageNotFoundException::new);
+            List<AppointmentRecord> patientsRecords = patient.getPatientsRecords();
+            List<AppointmentRecordDto> dtoRecordsList = new ArrayList<>();
+            patientsRecords.forEach(record -> dtoRecordsList.add(mapper.mapToAppRecordDto(record)));
+            session.getTransaction().commit();
+            return dtoRecordsList;
+        } catch (Exception exception){
             session.getTransaction().rollback();
             throw exception;
         }
-        return List.of();
     }
 
     private Long extractPatientIdFromRequest(HttpServletRequest request){

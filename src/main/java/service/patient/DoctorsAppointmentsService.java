@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.DoctorsAppointmentRepository;
+import service.Mapper;
 import service.dto.patient.DocAppForPatientDto;
-import service.mapper.DocAppDtoForPatientMapper;
 import util.SessionPool;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class DoctorsAppointmentsService {
 
     private final DoctorsAppointmentRepository doctorsAppointmentRepository;
 
-    private final DocAppDtoForPatientMapper doctorsAppointmentDtoMapper;
+    private final Mapper mapper;
 
     @SneakyThrows
     public ArrayList<DocAppForPatientDto> getVacantDoctorsAppointments(HttpServletRequest request){
@@ -34,7 +34,7 @@ public class DoctorsAppointmentsService {
             throw exception;
         }
         ArrayList<DocAppForPatientDto> doctorsAppointmentsDtoList = new ArrayList<>();
-        doctorsAppointments.forEach(doctorsAppointment -> doctorsAppointmentsDtoList.add(doctorsAppointmentDtoMapper.mapFrom(doctorsAppointment)));
+        doctorsAppointments.forEach(doctorsAppointment -> doctorsAppointmentsDtoList.add(mapper.mapToDocAppForPatientDto(doctorsAppointment)));
         return doctorsAppointmentsDtoList;
     }
 

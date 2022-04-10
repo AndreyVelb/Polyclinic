@@ -6,39 +6,40 @@ import entity.WorkSchedule;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
-import repository.DoctorRepository;
 import repository.DoctorsAppointmentRepository;
 import repository.WorkScheduleRepository;
+import service.Mapper;
 import service.dto.admin.ScheduleAsMapDto;
-import service.mapper.ScheduleAsMapDtoMapper;
 import util.SessionPool;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class NextWeekTimetableService {
 
-    private final DoctorRepository doctorRepository;
     private final DoctorsAppointmentRepository doctorsAppointmentRepository;
     private final WorkScheduleRepository workScheduleRepository;
 
-    private final ScheduleAsMapDtoMapper scheduleAsListDtoMapper;
+    private final Mapper mapper;
 
     @SneakyThrows
     public void createDoctorsAppointmentsOnNextWeek(){
-        ArrayList<DoctorsAppointment> doctorsAppointmentList = new ArrayList<>();
         Session session = SessionPool.getSession();
         try {
             session.beginTransaction();
-            var mayBeLastAppDateAndTime = doctorsAppointmentRepository.getLatestAppointmentDate(session);
+            LocalDateTime lastAppDateAndTime = doctorsAppointmentRepository.getLatestAppointmentDate(session).orElse(LocalDateTime.of(LocalDate.of(0, 0, 0), LocalTime.of(0, 0)));
             ArrayList<WorkSchedule> allDoctorsSchedules = workScheduleRepository.findAll(session);
             ArrayList<ScheduleAsMapDto> scheduleDtoList = new ArrayList<>();
-            allDoctorsSchedules.forEach(schedule -> scheduleDtoList.add(scheduleAsListDtoMapper.mapFrom(schedule, schedule.getDoctor())));
-            List<DoctorsAppointment> newWeekTimetable = createNewWeekTimetable(scheduleDtoList, mayBeLastAppDateAndTime);
+            allDoctorsSchedules.forEach(schedule -> scheduleDtoList.add(mapper.mapToScheduleAsMapDto(schedule, schedule.getDoctor())));
+            List<DoctorsAppointment> newWeekTimetable = createNewWeekTimetable(scheduleDtoList, lastAppDateAndTime);
             newWeekTimetable.forEach(doctorsAppointment -> doctorsAppointmentRepository.save(doctorsAppointment, session));
             session.getTransaction().commit();
         }catch (Exception exception){
@@ -47,9 +48,9 @@ public class NextWeekTimetableService {
         }
     }
 
-    private List<DoctorsAppointment> createNewWeekTimetable(ArrayList<ScheduleAsMapDto> scheduleDtoList, Optional<LocalDateTime> mayBeLastAppDateAndTime){
+    private List<DoctorsAppointment> createNewWeekTimetable(ArrayList<ScheduleAsMapDto> scheduleDtoList, LocalDateTime lastAppDateAndTime){
         List<DoctorsAppointment> newWeekTimetable = new ArrayList<>();
-        List<LocalDate> workWeek = getNextWorkWeek(mayBeLastAppDateAndTime);
+        List<LocalDate> workWeek = getNextWorkWeek(lastAppDateAndTime);
         for (ScheduleAsMapDto scheduleDto : scheduleDtoList) {
             List<LocalDate> doctorsWorkDays = getDoctorsWorkDays(scheduleDto, workWeek);
             List<LocalDateTime> allAppDatesAndTime = getAllAppointmentDatesAndTime(doctorsWorkDays);
@@ -87,20 +88,19 @@ public class NextWeekTimetableService {
         return dateTimeSet;
     }
 
-    private List<LocalDate> getNextWorkWeek(Optional<LocalDateTime> mayBeLastAppDateAndTime){
+    private List<LocalDate> getNextWorkWeek(LocalDateTime lastAppDateAndTime){
         ArrayList<LocalDate> dateToTimetable = new ArrayList<>();
         int year;
         int month;
         int day;
-        if (mayBeLastAppDateAndTime.isEmpty()
-            || LocalDate.now().isAfter(mayBeLastAppDateAndTime.get().toLocalDate())){
+        if (LocalDate.now().isAfter(lastAppDateAndTime.toLocalDate())){
             year = LocalDate.now().getYear();
             month = LocalDate.now().getMonth().getValue();
             day = LocalDate.now().getDayOfMonth();
-        }else if(LocalDate.now().equals(mayBeLastAppDateAndTime.get().toLocalDate())){
+        }else if(LocalDate.now().equals(lastAppDateAndTime.toLocalDate())){
             return Collections.emptyList();
         }else {
-            LocalDate lastAppDate = mayBeLastAppDateAndTime.get().toLocalDate();
+            LocalDate lastAppDate = lastAppDateAndTime.toLocalDate();
             year = lastAppDate.getYear();
             month = lastAppDate.getMonth().getValue();
             day = lastAppDate.getDayOfMonth();

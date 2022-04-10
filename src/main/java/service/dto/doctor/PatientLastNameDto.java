@@ -19,5 +19,5 @@ public class PatientLastNameDto implements Dto {
     @NotNull(message = "Поле ФАМИЛИЯ не должно быть пустым")
     @Size(max = 20, message = "Поле ФАМИЛИЯ не должно превышать 20 символов")
     @Pattern(regexp = "[а-яА-Я-]+", message = "Поле ФАМИЛИЯ должно быть записано кирилическими буквами")
-    String lastName;
+    private String lastName;
 }

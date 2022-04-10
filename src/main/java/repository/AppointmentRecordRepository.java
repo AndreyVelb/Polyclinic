@@ -1,7 +1,6 @@
 package repository;
 
 import entity.AppointmentRecord;
-import entity.Doctor;
 import org.hibernate.Session;
 
 import java.util.Optional;

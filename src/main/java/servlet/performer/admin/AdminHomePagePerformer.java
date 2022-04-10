@@ -1,25 +1,30 @@
 package servlet.performer.admin;
 
-import exception.*;
+import exception.DtoValidationException;
+import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import repository.DoctorRepository;
 import repository.PatientRepository;
 import service.admin.AdminHomePageService;
 import service.dto.admin.AdminStatisticsDto;
-import servlet.converter.response.AdminStatisticsDtoConverter;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /admin/{id}
@@ -35,27 +40,35 @@ public class AdminHomePagePerformer implements Performer {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
 
-    private final AdminStatisticsDtoConverter adminStatisticsDtoConverter;
+    private final ObjectMapper objectMapper;
 
 
     @Override
     @SneakyThrows
-    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException, PageNotFoundException {
+    public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         if (request.getMethod().equals(HttpMethod.GET)){
-            performGET(writer, request, response);
+            performGET(writer, response);
         } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        int patientCount = service.getNumbersOfSubjects(patientRepository);
-        int doctorCount = service.getNumbersOfSubjects(doctorRepository);
-        AdminStatisticsDto adminStatisticsDto = AdminStatisticsDto.builder()
-                .patientCount(patientCount)
-                .doctorCount(doctorCount)
-                .build();
-        String jsonStatistics = adminStatisticsDtoConverter.convert(adminStatisticsDto);
-        new JsonResponse().send(writer, response, jsonStatistics, SC_OK);
+    private void performGET(PrintWriter writer, HttpServletResponse response){
+        try {
+            int patientCount = service.getNumbersOfSubjects(patientRepository);
+            int doctorCount = service.getNumbersOfSubjects(doctorRepository);
+            AdminStatisticsDto adminStatisticsDto = AdminStatisticsDto.builder()
+                    .patientCount(patientCount)
+                    .doctorCount(doctorCount)
+                    .build();
+            String jsonStatistics = objectMapper.writeValueAsString(adminStatisticsDto);
+            new JsonResponse().send(writer, response, jsonStatistics, SC_OK);
+        }
+        catch (UserAlreadyExistsException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        }
     }
 
     @Override

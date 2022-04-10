@@ -1,14 +1,20 @@
 package servlet.performer.doctor;
 
-import exception.*;
+import exception.DtoValidationException;
+import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.PageNotFoundException;
+import exception.ServerTechnicalProblemsException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.codehaus.jackson.map.ObjectMapper;
 import service.doctor.PatientsRecordsService;
 import service.dto.doctor.AppointmentRecordDto;
-import servlet.converter.response.AppointmentRecordDtoListConverter;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
@@ -18,7 +24,9 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /doctor/{id}/patients/{id}/records
@@ -33,7 +41,7 @@ public class PatientsRecordsPerformer implements Performer {
 
     private final PatientsRecordsService service;
 
-    private final AppointmentRecordDtoListConverter appointmentRecordConverter;
+    private final ObjectMapper objectMapper;
 
     @Override
     @SneakyThrows
@@ -45,9 +53,16 @@ public class PatientsRecordsPerformer implements Performer {
 
     @SneakyThrows
     private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        List<AppointmentRecordDto> patientsRecordsDtoList = service.getPatientsRecordsDto(request);
-        String json = appointmentRecordConverter.convert(patientsRecordsDtoList);
-        new JsonResponse().send(writer, response, json, SC_OK);
+        try {
+            List<AppointmentRecordDto> patientsRecordsDtoList = service.getPatientsRecordsDto(request);
+            String json = objectMapper.writeValueAsString(patientsRecordsDtoList);
+            new JsonResponse().send(writer, response, json, SC_OK);
+        } catch (UserAlreadyExistsException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        }
     }
 
     @Override

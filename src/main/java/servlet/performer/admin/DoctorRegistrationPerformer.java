@@ -1,25 +1,32 @@
 package servlet.performer.admin;
 
-import entity.Doctor;
+import exception.AlreadyBookedException;
+import exception.DtoValidationException;
 import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.ServerTechnicalProblemsException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import service.admin.DoctorRegistrationService;
 import service.dto.doctor.DoctorDto;
-import service.dto.patient.PatientDto;
-import service.patient.PatientRegistrationService;
 import servlet.performer.Performer;
 import servlet.response.DoctorRegistrationResponse;
-import servlet.response.PatientRegistrationResponse;
+import servlet.response.ExceptionResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
+import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
 import java.util.Set;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
+import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /admin/{id}/doc-registration
@@ -43,8 +50,19 @@ public class DoctorRegistrationPerformer implements Performer {
 
     @SneakyThrows
     private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        DoctorDto doctorDto = service.registration(request);
-        new DoctorRegistrationResponse().send(writer, response, doctorDto, SC_CREATED);
+        try {
+            Long doctorId = service.registration(request);
+            new DoctorRegistrationResponse().send(writer, response, doctorId, SC_CREATED);
+        }
+        catch (UserAlreadyExistsException
+                | ConstraintViolationException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        } catch (AlreadyBookedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_CONFLICT);
+        }
     }
 
     @Override

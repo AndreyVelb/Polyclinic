@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import service.dto.Dto;
 import service.dto.doctor.DoctorDto;
 import service.dto.patient.PatientDto;
-
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -16,11 +15,11 @@ import java.time.LocalDateTime;
 @Builder
 public class DocAppForAdminDto implements Dto {
 
-    Long id;
+    private Long id;
 
-    DoctorDto doctorDto;
+    private DoctorDto doctorDto;
 
-    LocalDateTime dateAndTime;
+    private LocalDateTime dateAndTime;
 
-    PatientDto patientDto;
+    private PatientDto patientDto;
 }

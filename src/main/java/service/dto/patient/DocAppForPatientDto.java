@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 @Builder
 public class DocAppForPatientDto {
 
-    Long id;
+    private Long id;
 
-    DoctorDto doctorDto;
+    private DoctorDto doctorDto;
 
-    LocalDateTime dateAndTime;
+    private LocalDateTime dateAndTime;
 }

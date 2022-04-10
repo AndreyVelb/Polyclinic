@@ -1,17 +1,26 @@
 package servlet.performer.doctor;
 
-import exception.*;
+import exception.AlreadyBookedException;
+import exception.DtoValidationException;
+import exception.MethodNotAllowedException;
+import exception.NotAuthenticatedException;
+import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jdk.jfr.Registered;
 import lombok.SneakyThrows;
 import servlet.performer.Performer;
+import servlet.response.ExceptionResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
+import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Set;
+
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  *      /doctor/{id}/logout
@@ -27,14 +36,25 @@ public class DoctorLogoutPerformer implements Performer{
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         if (request.getMethod().equals(HttpMethod.POST)){
-            performPOST(writer, request, response);
+            performPOST(request, response);
         }else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
-        request.getSession().invalidate();
-        response.sendRedirect(UrlPath.DOCTOR_LOGIN);
+    private void performPOST(HttpServletRequest request, HttpServletResponse response){
+        try {
+            request.getSession().invalidate();
+            response.sendRedirect(UrlPath.DOCTOR_LOGIN);
+        } catch (UserAlreadyExistsException
+                | ConstraintViolationException
+                | DtoValidationException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
+        } catch (NotAuthenticatedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_UNAUTHORIZED);
+        } catch (AlreadyBookedException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, exception, SC_CONFLICT);
+        }
+
     }
 
     @Override
@@ -52,11 +72,9 @@ public class DoctorLogoutPerformer implements Performer{
         String requestPath = request.getRequestURI();
         if(requestPath.startsWith(path)){
             String[] requestPathParts = request.getPathInfo().split("/");
-            if(requestPathParts.length == 4
-                    && requestPathParts[2].matches("[1-90]+")
-                    && requestPathParts[3].matches(logoutSubPath)){     // 0-""/ 1-"doctor"/ 2-{id}/ 3-"logout"
-                return true;
-            }else return false;
+            return requestPathParts.length == 4
+                    && requestPathParts[2].matches("[1-90]+")       // 0-""/ 1-"doctor"/ 2-{id}/ 3-"logout"
+                    && requestPathParts[3].matches(logoutSubPath);
         }else return false;
     }
 }

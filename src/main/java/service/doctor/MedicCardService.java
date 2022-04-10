@@ -6,28 +6,26 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import repository.PatientRepository;
+import service.Mapper;
 import service.dto.patient.PatientDto;
-import service.mapper.PatientDtoMapper;
 import util.SessionPool;
-
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public class MedicCardService {
 
     private final PatientRepository patientRepository;
 
-    private final PatientDtoMapper patientDtoMapper;
+    private final Mapper mapper;
 
     @SneakyThrows
     public PatientDto getPatientMedicCard(Long id){
         Session session = SessionPool.getSession();
         session.beginTransaction();
-        Optional<Patient> mayBePatient = patientRepository.findById(id, session);
-        if (mayBePatient.isPresent()){
+        try {
+            Patient patient = patientRepository.findById(id, session).orElseThrow(PageNotFoundException::new);
             session.getTransaction().commit();
-            return patientDtoMapper.mapFrom(mayBePatient.get());
-        }else {
+            return mapper.mapToPatientDto(patient);
+        }catch (Exception exception){
             session.getTransaction().rollback();
             throw new PageNotFoundException();
         }
