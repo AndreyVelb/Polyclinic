@@ -8,9 +8,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public interface Repository <K extends Serializable, E extends BaseEntity<K>>{
+public interface Repository<K extends Serializable, E extends BaseEntity<K>> {
 
-    Long save (E entity, Session session) throws PSQLException;
+    Long save(E entity, Session session) throws PSQLException;
 
     void delete(K id, Session session);
 

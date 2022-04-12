@@ -27,7 +27,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /doctor/{id}/patients/{id}
+ * /doctor/{id}/patients/{id}
  */
 
 @RequiredArgsConstructor
@@ -43,16 +43,16 @@ public class MedicCardPerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) throws IOException, UserAlreadyExistsException, ServerTechnicalProblemsException, NotAuthenticatedException {
-        if (request.getMethod().equals(HttpMethod.GET)){
+        if (request.getMethod().equals(HttpMethod.GET)) {
             performGET(writer, request, response);
-        }else throw new MethodNotAllowedException();
+        } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
+    private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         try {
             String[] requestPathParts = request.getPathInfo().split("/");
-            Long patientId =  Long.parseLong(String.valueOf(requestPathParts[4]));
+            Long patientId = Long.parseLong(String.valueOf(requestPathParts[4]));
             PatientDto patientDto = service.getPatientMedicCard(patientId);
             String json = objectMapper.writeValueAsString(patientDto);
             JsonResponse jsonResponse = new JsonResponse();
@@ -68,7 +68,7 @@ public class MedicCardPerformer implements Performer {
     @Override
     public boolean isMethodCanBePerformed(HttpServletRequest request) {
         for (String method : performableMethods) {
-            if (method.equals(request.getMethod())){
+            if (method.equals(request.getMethod())) {
                 return true;
             }
         }
@@ -78,12 +78,12 @@ public class MedicCardPerformer implements Performer {
     @Override
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
-        if(requestPath.startsWith(path)){
+        if (requestPath.startsWith(path)) {
             String[] requestPathParts = request.getPathInfo().split("/");
             return requestPathParts.length == 5
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(patientsSubPath)
                     && requestPathParts[4].matches("[1-90]+");  // 0-""/ 1-"doctor"/ 2-{id}/ 3-"patients"/ 4-{id}
-        }else return false;
+        } else return false;
     }
 }

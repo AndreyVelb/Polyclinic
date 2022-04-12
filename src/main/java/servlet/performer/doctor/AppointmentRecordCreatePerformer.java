@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.codehaus.jackson.map.ObjectMapper;
 import service.doctor.AppointmentRecordCreateService;
-import service.dto.doctor.AppointmentRecordDto;
 import service.dto.doctor.AppointmentRecordRequestDto;
 import servlet.performer.Performer;
 import servlet.response.AppointmentRecordCreateResponse;
@@ -29,7 +28,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /doctor/{id}/patients/{id}/writing-record
+ * /doctor/{id}/patients/{id}/writing-record
  */
 
 @RequiredArgsConstructor
@@ -47,13 +46,13 @@ public class AppointmentRecordCreatePerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        if (request.getMethod().equals(HttpMethod.POST)){
+        if (request.getMethod().equals(HttpMethod.POST)) {
             performPOST(writer, request, response);
-        }else throw new MethodNotAllowedException();
+        } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
+    private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         try {
             AppointmentRecordRequestDto appointmentRecordRequestDto = objectMapper.readValue(request.getInputStream(), AppointmentRecordRequestDto.class);
             Long appRecordId = service.writeAndSaveAppointmentRecord(request, appointmentRecordRequestDto);
@@ -73,7 +72,7 @@ public class AppointmentRecordCreatePerformer implements Performer {
     @Override
     public boolean isMethodCanBePerformed(HttpServletRequest request) {
         for (String method : performableMethods) {
-            if (method.equals(request.getMethod())){
+            if (method.equals(request.getMethod())) {
                 return true;
             }
         }
@@ -83,13 +82,13 @@ public class AppointmentRecordCreatePerformer implements Performer {
     @Override
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
-        if(requestPath.startsWith(path)){
+        if (requestPath.startsWith(path)) {
             String[] requestPathParts = request.getPathInfo().split("/");
             return requestPathParts.length == 6
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(patientsSubPath)
                     && requestPathParts[4].matches("[1-90]+")
                     && requestPathParts[5].matches(writingRecordSubPath);   // 0-""/ 1-"doctor"/ 2-{id}/ 3-"patients"/ 4-{id}/ 5-"writing-record"
-        }else return false;
+        } else return false;
     }
 }

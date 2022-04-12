@@ -8,14 +8,14 @@ import util.SessionPool;
 @RequiredArgsConstructor
 public class AdminHomePageService {
 
-    public int getNumbersOfSubjects(Repository repository){
+    public int getNumbersOfSubjects(Repository repository) {
         Session session = SessionPool.getSession();
         try {
             session.beginTransaction();
             int size = repository.findAll(session).size();
             session.getTransaction().commit();
             return size;
-        }catch (Exception exception){
+        } catch (Exception exception) {
             session.getTransaction().rollback();
             throw exception;
         }

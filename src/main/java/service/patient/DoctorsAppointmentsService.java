@@ -21,7 +21,7 @@ public class DoctorsAppointmentsService {
     private final Mapper mapper;
 
     @SneakyThrows
-    public ArrayList<DocAppForPatientDto> getVacantDoctorsAppointments(HttpServletRequest request){
+    public ArrayList<DocAppForPatientDto> getVacantDoctorsAppointments(HttpServletRequest request) {
         Session session = SessionPool.getSession();
         Long doctorId = extractDoctorIdFromRequest(request);
         List<DoctorsAppointment> doctorsAppointments;
@@ -29,7 +29,7 @@ public class DoctorsAppointmentsService {
             session.beginTransaction();
             doctorsAppointments = doctorsAppointmentRepository.getVacantAppointmentsAtDoctor(doctorId, session);
             session.getTransaction().commit();
-        }catch (Exception exception){
+        } catch (Exception exception) {
             session.getTransaction().rollback();
             throw exception;
         }
@@ -38,7 +38,7 @@ public class DoctorsAppointmentsService {
         return doctorsAppointmentsDtoList;
     }
 
-    private Long extractDoctorIdFromRequest(HttpServletRequest request){
+    private Long extractDoctorIdFromRequest(HttpServletRequest request) {
         String[] requestPathParts = request.getPathInfo().split("/");
         return Long.parseLong(requestPathParts[4]);       // 0-""/ 1-"patient"/ 2-{id}/ 3-"doctors"/ 4-{id}/...
     }

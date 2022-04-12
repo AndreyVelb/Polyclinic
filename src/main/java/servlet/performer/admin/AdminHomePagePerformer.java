@@ -27,7 +27,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /admin/{id}
+ * /admin/{id}
  */
 
 @RequiredArgsConstructor
@@ -46,13 +46,13 @@ public class AdminHomePagePerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        if (request.getMethod().equals(HttpMethod.GET)){
+        if (request.getMethod().equals(HttpMethod.GET)) {
             performGET(writer, response);
         } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performGET(PrintWriter writer, HttpServletResponse response){
+    private void performGET(PrintWriter writer, HttpServletResponse response) {
         try {
             int patientCount = service.getNumbersOfSubjects(patientRepository);
             int doctorCount = service.getNumbersOfSubjects(doctorRepository);
@@ -62,8 +62,7 @@ public class AdminHomePagePerformer implements Performer {
                     .build();
             String jsonStatistics = objectMapper.writeValueAsString(adminStatisticsDto);
             new JsonResponse().send(writer, response, jsonStatistics, SC_OK);
-        }
-        catch (UserAlreadyExistsException
+        } catch (UserAlreadyExistsException
                 | DtoValidationException exception) {
             new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
         } catch (NotAuthenticatedException exception) {
@@ -74,7 +73,7 @@ public class AdminHomePagePerformer implements Performer {
     @Override
     public boolean isMethodCanBePerformed(HttpServletRequest request) {
         for (String method : performableMethods) {
-            if (method.equals(request.getMethod())){
+            if (method.equals(request.getMethod())) {
                 return true;
             }
         }
@@ -84,9 +83,9 @@ public class AdminHomePagePerformer implements Performer {
     @Override
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
-        if(requestPath.startsWith(path)){
+        if (requestPath.startsWith(path)) {
             String[] requestPathParts = request.getPathInfo().split("/");
             return requestPathParts.length == 3 && requestPathParts[2].matches("[1-90]+");      // 0-""/ 1-"admin"/ 2-"{some id}"
-        }else return false;
+        } else return false;
     }
 }

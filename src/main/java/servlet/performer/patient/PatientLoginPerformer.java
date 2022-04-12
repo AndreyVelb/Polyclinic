@@ -13,6 +13,7 @@ import service.patient.PatientLoginService;
 import servlet.performer.Performer;
 import servlet.response.ExceptionResponse;
 import util.HttpMethod;
+import util.SessionRole;
 import util.UrlPath;
 
 import javax.validation.ConstraintViolationException;
@@ -24,7 +25,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /patient/login
+ * /patient/login
  */
 
 @RequiredArgsConstructor
@@ -37,19 +38,19 @@ public class PatientLoginPerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        if (request.getMethod().equals(HttpMethod.POST)){
+        if (request.getMethod().equals(HttpMethod.POST)) {
             performPOST(writer, request, response);
         }
     }
 
     @SneakyThrows
-    private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
+    private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         try {
             PatientDto patientDto = service.authenticate(request);
             var session = request.getSession();
-            PatientDto sessionPatientDto = (PatientDto) session.getAttribute("PATIENT");
-            if (sessionPatientDto == null){
-                request.getSession().setAttribute("PATIENT", patientDto);
+            PatientDto sessionPatientDto = (PatientDto) session.getAttribute(SessionRole.PATIENT);
+            if (sessionPatientDto == null) {
+                request.getSession().setAttribute(SessionRole.PATIENT, patientDto);
             }
             response.sendRedirect(buildPatientsPathForChooseDoctor(patientDto));
         } catch (UserAlreadyExistsException
@@ -67,7 +68,7 @@ public class PatientLoginPerformer implements Performer {
     @Override
     public boolean isMethodCanBePerformed(HttpServletRequest request) {
         for (String method : performableMethods) {
-            if (method.equals(request.getMethod())){
+            if (method.equals(request.getMethod())) {
                 return true;
             }
         }
@@ -80,7 +81,7 @@ public class PatientLoginPerformer implements Performer {
         return path.equals(requestPath);
     }
 
-    private String buildPatientsPathForChooseDoctor(PatientDto patientDto){
+    private String buildPatientsPathForChooseDoctor(PatientDto patientDto) {
         return UrlPath.PATIENT_PATH + "/" + patientDto.getId() + "/" + UrlPath.PATIENT_SUBPATH_DOCTORS;
     }
 }

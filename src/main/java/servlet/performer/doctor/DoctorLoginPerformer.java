@@ -15,6 +15,7 @@ import service.dto.doctor.DoctorDto;
 import servlet.performer.Performer;
 import servlet.response.ExceptionResponse;
 import util.HttpMethod;
+import util.SessionRole;
 import util.UrlPath;
 
 import javax.validation.ConstraintViolationException;
@@ -26,7 +27,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /doctor/login
+ * /doctor/login
  */
 
 @RequiredArgsConstructor
@@ -39,13 +40,13 @@ public class DoctorLoginPerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        if (request.getMethod().equals(HttpMethod.POST)){
+        if (request.getMethod().equals(HttpMethod.POST)) {
             performPOST(request, response);
-        }else throw new MethodNotAllowedException();
+        } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performPOST(HttpServletRequest request, HttpServletResponse response){
+    private void performPOST(HttpServletRequest request, HttpServletResponse response) {
         try {
             DoctorDto doctorDto = service.authenticate(request);
             if (doctorDto.getSpeciality() == DoctorSpeciality.CHIEF_DOCTOR) {
@@ -68,19 +69,19 @@ public class DoctorLoginPerformer implements Performer {
     @SneakyThrows
     private void adminLogin(HttpServletRequest request, HttpServletResponse response, DoctorDto doctorDto) {
         var session = request.getSession();
-        DoctorDto sessionDoctorDto = (DoctorDto) session.getAttribute("ADMIN");
+        DoctorDto sessionDoctorDto = (DoctorDto) session.getAttribute(SessionRole.ADMIN);
         if (sessionDoctorDto == null) {
-            session.setAttribute("ADMIN", doctorDto);
+            session.setAttribute(SessionRole.ADMIN, doctorDto);
         }
         response.sendRedirect(UrlPath.ADMIN_PATH + "/" + doctorDto.getId());
     }
 
     @SneakyThrows
-    private void doctorLogin(HttpServletRequest request, HttpServletResponse response, DoctorDto doctorDto){
+    private void doctorLogin(HttpServletRequest request, HttpServletResponse response, DoctorDto doctorDto) {
         var session = request.getSession();
-        DoctorDto sessionDoctorDto = (DoctorDto) session.getAttribute("DOCTOR");
-        if (sessionDoctorDto == null){
-            session.setAttribute("DOCTOR", doctorDto);
+        DoctorDto sessionDoctorDto = (DoctorDto) session.getAttribute(SessionRole.DOCTOR);
+        if (sessionDoctorDto == null) {
+            session.setAttribute(SessionRole.DOCTOR, doctorDto);
         }
         response.sendRedirect(UrlPath.DOCTOR_PATH + "/" + doctorDto.getId() + "/" + UrlPath.DOCTOR_SUBPATH_PATIENTS);
     }
@@ -88,7 +89,7 @@ public class DoctorLoginPerformer implements Performer {
     @Override
     public boolean isMethodCanBePerformed(HttpServletRequest request) {
         for (String method : performableMethods) {
-            if (method.equals(request.getMethod())){
+            if (method.equals(request.getMethod())) {
                 return true;
             }
         }

@@ -11,6 +11,7 @@ import service.dto.doctor.PatientLastNameDto;
 import service.dto.patient.PatientDto;
 import service.dto.validator.DtoValidator;
 import util.SessionPool;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class SearchPatientService {
             ArrayList<PatientDto> patientDtoList = new ArrayList<>();
             patientsList.forEach(patient -> patientDtoList.add(mapper.mapToPatientDto(patient)));
             return patientDtoList;
-        } catch (Exception exception){
+        } catch (Exception exception) {
             session.getTransaction().rollback();
             throw exception;
         }

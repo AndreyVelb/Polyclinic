@@ -1,5 +1,6 @@
 package service.patient;
 
+import config.Config;
 import entity.Patient;
 import exception.NotAuthenticatedException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,8 @@ import util.SessionPool;
 @RequiredArgsConstructor
 public class PatientLoginService {
 
+    private final Config config;
+
     private final PatientRepository patientRepository;
 
     private final ObjectMapper objectMapper;
@@ -23,16 +26,17 @@ public class PatientLoginService {
     private final Mapper mapper;
 
     @SneakyThrows
-    public PatientDto authenticate(HttpServletRequest request){
+    public PatientDto authenticate(HttpServletRequest request) {
         Session session = SessionPool.getSession();
         PatientLoginDto patientLoginDto = objectMapper.readValue(request.getInputStream(), PatientLoginDto.class);
         session.beginTransaction();
         try {
-            Patient patient = patientRepository.authenticate(patientLoginDto.getLogin(), patientLoginDto.getPassword(), session).orElseThrow(NotAuthenticatedException::new);
+            Patient patient = patientRepository.authenticate(patientLoginDto.getLogin(), patientLoginDto.getPassword(), session)
+                    .orElseThrow(() -> new NotAuthenticatedException(config.getNotAuthenticatedExMessage()));
             PatientDto patientDto = mapper.mapToPatientDto(patient);
             session.getTransaction().commit();
             return patientDto;
-        } catch (Exception exception){
+        } catch (Exception exception) {
             session.getTransaction().rollback();
             throw exception;
         }

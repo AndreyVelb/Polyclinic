@@ -1,7 +1,7 @@
 package service.doctor;
 
+import config.Config;
 import entity.Doctor;
-import exception.DoctorNotFoundException;
 import exception.NotAuthenticatedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +14,10 @@ import service.dto.doctor.DoctorDto;
 import service.dto.doctor.DoctorLoginDto;
 import util.SessionPool;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 public class DoctorLoginService {
+
+    private final Config config;
 
     private final DoctorRepository doctorRepository;
 
@@ -31,10 +31,11 @@ public class DoctorLoginService {
         DoctorLoginDto doctorLoginDto = objectMapper.readValue(request.getInputStream(), DoctorLoginDto.class);
         session.beginTransaction();
         try {
-            Doctor doctor = doctorRepository.authenticate(doctorLoginDto.getLogin(), doctorLoginDto.getPassword(), session).orElseThrow(NotAuthenticatedException::new);
+            Doctor doctor = doctorRepository.authenticate(doctorLoginDto.getLogin(), doctorLoginDto.getPassword(), session)
+                    .orElseThrow(() -> new NotAuthenticatedException(config.getNotAuthenticatedExMessage()));
             session.getTransaction().commit();
             return mapper.mapToDoctorDto(doctor);
-        } catch (Exception exception){
+        } catch (Exception exception) {
             session.getTransaction().rollback();
             throw exception;
         }

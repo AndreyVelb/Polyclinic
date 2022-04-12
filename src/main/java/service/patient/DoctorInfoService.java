@@ -19,7 +19,7 @@ public class DoctorInfoService {
     private final Mapper mapper;
 
     @SneakyThrows
-    public DoctorDto getDoctorDto(HttpServletRequest request){
+    public DoctorDto getDoctorDto(HttpServletRequest request) {
         Session session = SessionPool.getSession();
         Long doctorId = extractDoctorIdFromRequest(request);
         session.beginTransaction();
@@ -27,13 +27,13 @@ public class DoctorInfoService {
             Doctor doctor = doctorRepository.findById(doctorId, session).orElseThrow(PageNotFoundException::new);
             session.getTransaction().commit();
             return mapper.mapToDoctorDto(doctor);
-        } catch (Exception exception){
+        } catch (Exception exception) {
             session.getTransaction().rollback();
             throw exception;
         }
     }
 
-    private Long extractDoctorIdFromRequest(HttpServletRequest request){
+    private Long extractDoctorIdFromRequest(HttpServletRequest request) {
         String[] requestPathParts = request.getPathInfo().split("/");
         return Long.parseLong(requestPathParts[4]);       // 0-""/ 1-"patient"/ 2-{id}/ 3-"doctors"/ 4-"{id}"/...
     }

@@ -26,7 +26,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /admin/{id}/timetable
+ * /admin/{id}/timetable
  */
 
 @RequiredArgsConstructor
@@ -79,6 +79,6 @@ public class TimetablePerformer implements Performer {
             return requestPathParts.length == 4
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(timetableSubPath);     // 0-""/ 1-"admin"/ 2-{id}/ 3-"timetable"
-        }else return false;
+        } else return false;
     }
 }

@@ -5,7 +5,6 @@ import entity.WorkSchedule;
 import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import repository.DoctorRepository;
@@ -14,6 +13,8 @@ import service.Mapper;
 import service.dto.admin.DoctorRegistrationDto;
 import service.dto.validator.DtoValidator;
 import util.SessionPool;
+
+import java.io.IOException;
 
 @RequiredArgsConstructor
 public class DoctorRegistrationService {
@@ -26,8 +27,7 @@ public class DoctorRegistrationService {
 
     private final DtoValidator dtoValidator;
 
-    @SneakyThrows
-    public Long registration(HttpServletRequest request) {
+    public Long registration(HttpServletRequest request) throws IOException {
         Session session = SessionPool.getSession();
         DoctorRegistrationDto doctorRegistrationDto = objectMapper.readValue(request.getInputStream(), DoctorRegistrationDto.class);
         dtoValidator.validate(doctorRegistrationDto);
@@ -36,15 +36,15 @@ public class DoctorRegistrationService {
         workSchedule.setDoctor(doctor);
         try {
             session.beginTransaction();
-            if (doctorRepository.findByLogin(doctor.getLogin(), session).isEmpty()){
-                Long doctorId = doctorRepository.registerDoctor(doctor, session);
+            if (doctorRepository.findByLogin(doctor.getLogin(), session).isEmpty()) {
+                Long doctorId = doctorRepository.save(doctor, session);
                 workScheduleRepository.save(workSchedule, session);
                 session.getTransaction().commit();
                 return doctorId;
             } else {
                 throw new UserAlreadyExistsException();
             }
-        }catch (Exception exception){
+        } catch (Exception exception) {
             session.getTransaction().rollback();
             throw exception;
         }

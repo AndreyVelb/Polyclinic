@@ -24,7 +24,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /admin/{id}/next-week-timetable
+ * /admin/{id}/next-week-timetable
  */
 
 @RequiredArgsConstructor
@@ -48,8 +48,7 @@ public class NextWeekTimetablePerformer implements Performer {
         try {
             service.createDoctorsAppointmentsOnNextWeek();
             response.sendRedirect(UrlPath.ADMIN_PATH + "/" + getAdminId(request) + "/" + UrlPath.ADMIN_SUBPATH_TIMETABLE);
-        }
-        catch (UserAlreadyExistsException
+        } catch (UserAlreadyExistsException
                 | ConstraintViolationException
                 | DtoValidationException exception) {
             new ExceptionResponse().send(response.getWriter(), response, exception, SC_BAD_REQUEST);
@@ -78,10 +77,10 @@ public class NextWeekTimetablePerformer implements Performer {
             return requestPathParts.length == 4
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(timetableOnNextWeekSubPath);     // 0-""/ 1-"admin"/ 2-{id}/ 3-"next-week-timetable"
-        }else return false;
+        } else return false;
     }
 
-    private Long getAdminId(HttpServletRequest request){
+    private Long getAdminId(HttpServletRequest request) {
         String[] requestPathParts = request.getPathInfo().split("/");
         return Long.parseLong(requestPathParts[2]);
     }

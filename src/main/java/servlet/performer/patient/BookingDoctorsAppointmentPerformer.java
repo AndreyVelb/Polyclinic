@@ -1,5 +1,6 @@
 package servlet.performer.patient;
 
+import config.Config;
 import exception.AlreadyBookedException;
 import exception.DtoValidationException;
 import exception.MethodNotAllowedException;
@@ -31,7 +32,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /patient/{id}/doctors/{id}/appointments/{id}
+ * /patient/{id}/doctors/{id}/appointments/{id}
  */
 
 @RequiredArgsConstructor
@@ -41,6 +42,8 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
     private static final String appointmentsSubPath = UrlPath.PATIENT_SUBPATH_DOCTORS_APPOINTMENTS;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET, HttpMethod.PUT);
 
+    private final Config config;
+
     private final BookingDoctorsAppointmentService service;
 
     private final ObjectMapper objectMapper;
@@ -48,17 +51,16 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        if (request.getMethod().equals(HttpMethod.GET)){
+        if (request.getMethod().equals(HttpMethod.GET)) {
             performGET(writer, request, response);
         }
-        if (request.getMethod().equals(HttpMethod.PUT)){
+        if (request.getMethod().equals(HttpMethod.PUT)) {
             performPUT(writer, request, response);
-        }
-        else throw new MethodNotAllowedException();
+        } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
+    private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         try {
             DocAppForPatientDto dto = service.getDoctorsAppointment(request);
             String docAppDtoAsJson = objectMapper.writeValueAsString(dto);
@@ -73,11 +75,11 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
     }
 
     @SneakyThrows
-    private void performPUT(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
+    private void performPUT(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         try {
             service.bookDoctorsAppointment(request);
-        } catch (OptimisticLockException exception){
-            new ExceptionResponse().send(response.getWriter(), response, new AlreadyBookedException(), SC_CONFLICT);
+        } catch (OptimisticLockException exception) {
+            new ExceptionResponse().send(response.getWriter(), response, new AlreadyBookedException(config.getAlreadyBookedExMessage()), SC_CONFLICT);
         } catch (UserAlreadyExistsException
                 | ConstraintViolationException
                 | DtoValidationException exception) {
@@ -94,7 +96,7 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
     @Override
     public boolean isMethodCanBePerformed(HttpServletRequest request) {
         for (String method : performableMethods) {
-            if (method.equals(request.getMethod())){
+            if (method.equals(request.getMethod())) {
                 return true;
             }
         }
@@ -104,7 +106,7 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
     @Override
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
-        if(requestPath.startsWith(path)){
+        if (requestPath.startsWith(path)) {
             String[] requestPathParts = request.getPathInfo().split("/");
             return requestPathParts.length == 7
                     && requestPathParts[2].matches("[1-90]+")
@@ -112,6 +114,6 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
                     && requestPathParts[4].matches("[1-90]+")
                     && requestPathParts[5].matches(appointmentsSubPath)
                     && requestPathParts[6].matches("[1-90]+");      // 0-""/ 1-"patient"/ 2-{id}/ 3-"doctors"/ 4-{id}/ 5-"appointments"/ 6-{id}
-        }else return false;
+        } else return false;
     }
 }

@@ -23,7 +23,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /patient/{id}/logout
+ * /patient/{id}/logout
  */
 
 @RequiredArgsConstructor
@@ -35,13 +35,13 @@ public class PatientLogoutPerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        if (request.getMethod().equals(HttpMethod.POST)){
+        if (request.getMethod().equals(HttpMethod.POST)) {
             performPOST(request, response);
-        }else throw new MethodNotAllowedException();
+        } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performPOST(HttpServletRequest request, HttpServletResponse response){
+    private void performPOST(HttpServletRequest request, HttpServletResponse response) {
         try {
             request.getSession().invalidate();
             response.sendRedirect(UrlPath.PATIENT_LOGIN);
@@ -60,7 +60,7 @@ public class PatientLogoutPerformer implements Performer {
     @Override
     public boolean isMethodCanBePerformed(HttpServletRequest request) {
         for (String method : performableMethods) {
-            if (method.equals(request.getMethod())){
+            if (method.equals(request.getMethod())) {
                 return true;
             }
         }
@@ -70,11 +70,11 @@ public class PatientLogoutPerformer implements Performer {
     @Override
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
-        if(requestPath.startsWith(path)){
+        if (requestPath.startsWith(path)) {
             String[] requestPathParts = request.getPathInfo().split("/");
             return requestPathParts.length == 4
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(logoutSubPath);      // 0-""/ 1-"patient"/ 2-{id}/ 3-"logout"
-        }else return false;
+        } else return false;
     }
 }

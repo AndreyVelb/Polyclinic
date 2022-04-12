@@ -26,7 +26,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /patient/{id}/doctors
+ * /patient/{id}/doctors
  */
 
 @RequiredArgsConstructor
@@ -43,13 +43,13 @@ public class DoctorChoicePerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        if (request.getMethod().equals(HttpMethod.GET)){
+        if (request.getMethod().equals(HttpMethod.GET)) {
             performGET(writer, request, response);
-        }else throw new MethodNotAllowedException();
+        } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
+    private void performGET(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         try {
             ArrayList<DoctorDto> doctorDtoList = service.getAllDoctors();
             String json = objectMapper.writeValueAsString(doctorDtoList);
@@ -65,7 +65,7 @@ public class DoctorChoicePerformer implements Performer {
     @Override
     public boolean isMethodCanBePerformed(HttpServletRequest request) {
         for (String method : performableMethods) {
-            if (method.equals(request.getMethod())){
+            if (method.equals(request.getMethod())) {
                 return true;
             }
         }
@@ -75,11 +75,11 @@ public class DoctorChoicePerformer implements Performer {
     @Override
     public boolean isAppropriatePath(HttpServletRequest request) {
         String requestPath = request.getRequestURI();
-        if(requestPath.startsWith(path)){
+        if (requestPath.startsWith(path)) {
             String[] requestPathParts = request.getPathInfo().split("/");
             return requestPathParts.length == 4
                     && requestPathParts[2].matches("[1-90]+")
                     && requestPathParts[3].matches(doctorsSubPath);  // 0-""/ 1-"patient"/ 2-{id}/ 3-"doctors"
-        }else return false;
+        } else return false;
     }
 }

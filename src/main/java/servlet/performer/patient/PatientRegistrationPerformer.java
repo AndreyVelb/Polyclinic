@@ -27,7 +27,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
- *      /join
+ * /join
  */
 
 @RequiredArgsConstructor
@@ -40,13 +40,13 @@ public class PatientRegistrationPerformer implements Performer {
     @Override
     @SneakyThrows
     public void performAndSendResponse(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
-        if (request.getMethod().equals(HttpMethod.POST)){
+        if (request.getMethod().equals(HttpMethod.POST)) {
             performPOST(writer, request, response);
-        }else throw new MethodNotAllowedException();
+        } else throw new MethodNotAllowedException();
     }
 
     @SneakyThrows
-    private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response){
+    private void performPOST(PrintWriter writer, HttpServletRequest request, HttpServletResponse response) {
         try {
             PatientDto patientDto = service.registration(request);
             new PatientRegistrationResponse().send(writer, response, patientDto, SC_CREATED);
@@ -64,7 +64,7 @@ public class PatientRegistrationPerformer implements Performer {
     @Override
     public boolean isMethodCanBePerformed(HttpServletRequest request) {
         for (String method : performableMethods) {
-            if (method.equals(request.getMethod())){
+            if (method.equals(request.getMethod())) {
                 return true;
             }
         }

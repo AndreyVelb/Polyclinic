@@ -10,6 +10,7 @@ import service.dto.doctor.DoctorDto;
 import util.SessionPool;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class DoctorChoiceService {
@@ -19,14 +20,14 @@ public class DoctorChoiceService {
     private final Mapper mapper;
 
     @SneakyThrows
-    public ArrayList<DoctorDto> getAllDoctors(){
+    public ArrayList<DoctorDto> getAllDoctors() {
         Session session = SessionPool.getSession();
-        ArrayList<Doctor> doctorsList;
+        List<Doctor> doctorsList;
         try {
             session.beginTransaction();
-            doctorsList = (ArrayList<Doctor>) doctorRepository.findAllDoctorsExceptAdmins(session);
+            doctorsList = doctorRepository.findAllDoctorsExceptAdmins(session);
             session.getTransaction().commit();
-        }catch (Exception exception){
+        } catch (Exception exception) {
             session.getTransaction().rollback();
             throw exception;
         }

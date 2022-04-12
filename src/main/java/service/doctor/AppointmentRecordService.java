@@ -11,8 +11,6 @@ import service.Mapper;
 import service.dto.doctor.AppointmentRecordDto;
 import util.SessionPool;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 public class AppointmentRecordService {
 
@@ -21,20 +19,21 @@ public class AppointmentRecordService {
     private final Mapper mapper;
 
     @SneakyThrows
-    public AppointmentRecordDto getAppointmentRecordDto(HttpServletRequest request){
+    public AppointmentRecordDto getAppointmentRecordDto(HttpServletRequest request) {
         Session session = SessionPool.getSession();
         Long appRecordId = extractAppointmentRecordIdFromRequest(request);
         session.beginTransaction();
         try {
-            AppointmentRecord appointmentRecord = appointmentRecordRepository.findById(appRecordId, session).orElseThrow(PageNotFoundException::new);
+            AppointmentRecord appointmentRecord = appointmentRecordRepository.findById(appRecordId, session)
+                    .orElseThrow(PageNotFoundException::new);
             return mapper.mapToAppRecordDto(appointmentRecord);
-        }catch (Exception exception){
+        } catch (Exception exception) {
             session.getTransaction().rollback();
             throw exception;
         }
     }
 
-    private Long extractAppointmentRecordIdFromRequest(HttpServletRequest request){
+    private Long extractAppointmentRecordIdFromRequest(HttpServletRequest request) {
         String[] requestPathParts = request.getPathInfo().split("/");
         return Long.parseLong(requestPathParts[6]);     // 0-""/ 1-"doctor"/ 2-{id}/ 3-"patients"/ 4-{id}/ 5-"records/ 6-"{id}"
     }

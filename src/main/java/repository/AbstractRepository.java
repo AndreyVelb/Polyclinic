@@ -14,7 +14,7 @@ public abstract class AbstractRepository<K extends Serializable, E extends BaseE
     private final Class<E> clazz;
 
     @Override
-    public Long save (E entity, Session session){
+    public Long save(E entity, Session session) {
         return (Long) session.save(entity);
 
     }
@@ -22,7 +22,7 @@ public abstract class AbstractRepository<K extends Serializable, E extends BaseE
     @Override
     public void delete(K id, Session session) {
         E exemplarForDelete = session.find(clazz, id);
-        if (exemplarForDelete != null){
+        if (exemplarForDelete != null) {
             session.delete(exemplarForDelete);
             session.flush();
         }
