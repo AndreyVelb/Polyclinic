@@ -35,7 +35,7 @@ public class PatientFilter implements Filter {
     }
 
     private boolean isPatientLoggedIn(HttpServletRequest httpRequest) {
-        PatientDto patientDto = (PatientDto) httpRequest.getSession().getAttribute(SessionRole.PATIENT);
+        PatientDto patientDto = (PatientDto) httpRequest.getSession().getAttribute(SessionRole.getPATIENT());
         return patientDto != null && isIdTrue(httpRequest, patientDto.getId());
     }
 

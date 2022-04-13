@@ -1,6 +1,5 @@
 package service.patient;
 
-import config.Config;
 import entity.DoctorsAppointment;
 import entity.Patient;
 import exception.DocAppointmentNotFoundException;
@@ -14,12 +13,11 @@ import repository.DoctorsAppointmentRepository;
 import repository.PatientRepository;
 import service.Mapper;
 import service.dto.patient.DocAppForPatientDto;
+import util.ExceptionMessage;
 import util.SessionPool;
 
 @RequiredArgsConstructor
 public class BookingDoctorsAppointmentService {
-
-    private final Config config;
 
     private final DoctorsAppointmentRepository doctorsAppointmentRepository;
     private final PatientRepository patientRepository;
@@ -33,7 +31,7 @@ public class BookingDoctorsAppointmentService {
         try {
             session.beginTransaction();
             DoctorsAppointment doctorAppointment = doctorsAppointmentRepository.findById(docAppId, session)
-                    .orElseThrow(() -> new NotFoundException(config.getNotFoundExMessage()));
+                    .orElseThrow(() -> new NotFoundException(ExceptionMessage.NOT_FOUND));
             session.getTransaction().commit();
             return mapper.mapToDocAppForPatientDto(doctorAppointment);
         } catch (Exception exception) {
@@ -50,9 +48,9 @@ public class BookingDoctorsAppointmentService {
         try {
             session.beginTransaction();
             Patient patient = (patientRepository.findById(patientId, session))
-                    .orElseThrow(() -> new PatientNotFoundException(config.getPatientNotFoundExMessage()));
+                    .orElseThrow(() -> new PatientNotFoundException(ExceptionMessage.PATIENT_NOT_FOUND));
             DoctorsAppointment doctorsAppointment = doctorsAppointmentRepository.findById(docAppId, session)
-                    .orElseThrow(() -> new DocAppointmentNotFoundException(config.getDocAppointmentNotFoundExMessage()));
+                    .orElseThrow(() -> new DocAppointmentNotFoundException(ExceptionMessage.DOC_APPOINTMENT_NOT_FOUND));
             doctorsAppointmentRepository.bookDoctorsAppointment(doctorsAppointment, patient, session);
             session.getTransaction().commit();
         } catch (Exception exception) {

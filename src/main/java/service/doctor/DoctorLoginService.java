@@ -1,6 +1,5 @@
 package service.doctor;
 
-import config.Config;
 import entity.Doctor;
 import exception.NotAuthenticatedException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,12 +11,11 @@ import repository.DoctorRepository;
 import service.Mapper;
 import service.dto.doctor.DoctorDto;
 import service.dto.doctor.DoctorLoginDto;
+import util.ExceptionMessage;
 import util.SessionPool;
 
 @RequiredArgsConstructor
 public class DoctorLoginService {
-
-    private final Config config;
 
     private final DoctorRepository doctorRepository;
 
@@ -32,7 +30,7 @@ public class DoctorLoginService {
         session.beginTransaction();
         try {
             Doctor doctor = doctorRepository.authenticate(doctorLoginDto.getLogin(), doctorLoginDto.getPassword(), session)
-                    .orElseThrow(() -> new NotAuthenticatedException(config.getNotAuthenticatedExMessage()));
+                    .orElseThrow(() -> new NotAuthenticatedException(ExceptionMessage.NOT_AUTHENTICATED));
             session.getTransaction().commit();
             return mapper.mapToDoctorDto(doctor);
         } catch (Exception exception) {

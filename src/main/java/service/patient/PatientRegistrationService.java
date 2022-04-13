@@ -1,6 +1,5 @@
 package service.patient;
 
-import config.Config;
 import entity.Patient;
 import exception.PatientNotFoundException;
 import exception.UserAlreadyExistsException;
@@ -14,12 +13,11 @@ import service.Mapper;
 import service.dto.patient.PatientDto;
 import service.dto.patient.PatientRegistrationDto;
 import service.dto.validator.DtoValidator;
+import util.ExceptionMessage;
 import util.SessionPool;
 
 @RequiredArgsConstructor
 public class PatientRegistrationService {
-
-    private final Config config;
 
     private final PatientRepository patientRepository;
 
@@ -38,7 +36,7 @@ public class PatientRegistrationService {
             if (patientRepository.findByLogin(patient.getLogin(), session).isEmpty()) {
                 patientRepository.save(patient, session);
                 Patient registeredPatient = patientRepository.findByLogin(patient.getLogin(), session)
-                        .orElseThrow(() -> new PatientNotFoundException(config.getPatientNotFoundExMessage()));
+                        .orElseThrow(() -> new PatientNotFoundException(ExceptionMessage.PATIENT_NOT_FOUND));
                 session.getTransaction().commit();
                 return mapper.mapToPatientDto(registeredPatient);
             } else throw new UserAlreadyExistsException();

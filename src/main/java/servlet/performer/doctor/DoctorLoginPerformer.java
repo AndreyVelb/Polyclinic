@@ -69,9 +69,9 @@ public class DoctorLoginPerformer implements Performer {
     @SneakyThrows
     private void adminLogin(HttpServletRequest request, HttpServletResponse response, DoctorDto doctorDto) {
         var session = request.getSession();
-        DoctorDto sessionDoctorDto = (DoctorDto) session.getAttribute(SessionRole.ADMIN);
+        DoctorDto sessionDoctorDto = (DoctorDto) session.getAttribute(SessionRole.getADMIN());
         if (sessionDoctorDto == null) {
-            session.setAttribute(SessionRole.ADMIN, doctorDto);
+            session.setAttribute(SessionRole.getADMIN(), doctorDto);
         }
         response.sendRedirect(UrlPath.ADMIN_PATH + "/" + doctorDto.getId());
     }
@@ -79,9 +79,9 @@ public class DoctorLoginPerformer implements Performer {
     @SneakyThrows
     private void doctorLogin(HttpServletRequest request, HttpServletResponse response, DoctorDto doctorDto) {
         var session = request.getSession();
-        DoctorDto sessionDoctorDto = (DoctorDto) session.getAttribute(SessionRole.DOCTOR);
+        DoctorDto sessionDoctorDto = (DoctorDto) session.getAttribute(SessionRole.getDOCTOR());
         if (sessionDoctorDto == null) {
-            session.setAttribute(SessionRole.DOCTOR, doctorDto);
+            session.setAttribute(SessionRole.getDOCTOR(), doctorDto);
         }
         response.sendRedirect(UrlPath.DOCTOR_PATH + "/" + doctorDto.getId() + "/" + UrlPath.DOCTOR_SUBPATH_PATIENTS);
     }

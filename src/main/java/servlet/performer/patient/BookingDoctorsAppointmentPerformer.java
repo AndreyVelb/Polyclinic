@@ -1,6 +1,5 @@
 package servlet.performer.patient;
 
-import config.Config;
 import exception.AlreadyBookedException;
 import exception.DtoValidationException;
 import exception.MethodNotAllowedException;
@@ -17,6 +16,7 @@ import service.patient.BookingDoctorsAppointmentService;
 import servlet.performer.Performer;
 import servlet.response.ExceptionResponse;
 import servlet.response.JsonResponse;
+import util.ExceptionMessage;
 import util.HttpMethod;
 import util.UrlPath;
 
@@ -41,8 +41,6 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
     private static final String doctorsSubPath = UrlPath.PATIENT_SUBPATH_DOCTORS;
     private static final String appointmentsSubPath = UrlPath.PATIENT_SUBPATH_DOCTORS_APPOINTMENTS;
     private static final Set<String> performableMethods = Set.of(HttpMethod.GET, HttpMethod.PUT);
-
-    private final Config config;
 
     private final BookingDoctorsAppointmentService service;
 
@@ -79,7 +77,7 @@ public class BookingDoctorsAppointmentPerformer implements Performer {
         try {
             service.bookDoctorsAppointment(request);
         } catch (OptimisticLockException exception) {
-            new ExceptionResponse().send(response.getWriter(), response, new AlreadyBookedException(config.getAlreadyBookedExMessage()), SC_CONFLICT);
+            new ExceptionResponse().send(response.getWriter(), response, new AlreadyBookedException(ExceptionMessage.ALREADY_BOOKED), SC_CONFLICT);
         } catch (UserAlreadyExistsException
                 | ConstraintViolationException
                 | DtoValidationException exception) {

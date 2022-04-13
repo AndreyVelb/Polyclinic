@@ -31,7 +31,7 @@ public class AdminFilter implements Filter {
     }
 
     private boolean isAdminLoggedIn(HttpServletRequest httpRequest) {
-        DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute(SessionRole.ADMIN);
+        DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute(SessionRole.getADMIN());
         return doctorDto != null && isIdTrue(httpRequest, doctorDto.getId());
     }
 

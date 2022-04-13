@@ -48,9 +48,9 @@ public class PatientLoginPerformer implements Performer {
         try {
             PatientDto patientDto = service.authenticate(request);
             var session = request.getSession();
-            PatientDto sessionPatientDto = (PatientDto) session.getAttribute(SessionRole.PATIENT);
+            PatientDto sessionPatientDto = (PatientDto) session.getAttribute(SessionRole.getPATIENT());
             if (sessionPatientDto == null) {
-                request.getSession().setAttribute(SessionRole.PATIENT, patientDto);
+                request.getSession().setAttribute(SessionRole.getPATIENT(), patientDto);
             }
             response.sendRedirect(buildPatientsPathForChooseDoctor(patientDto));
         } catch (UserAlreadyExistsException

@@ -35,12 +35,12 @@ public class DoctorFilter implements Filter {
     }
 
     private boolean isDoctorLoggedIn(HttpServletRequest httpRequest) {
-        DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute(SessionRole.DOCTOR);
+        DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute(SessionRole.getADMIN());
         return doctorDto != null && isIdTrue(httpRequest, doctorDto.getId());
     }
 
     private boolean isAdminLoggedIn(HttpServletRequest httpRequest) {
-        DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute(SessionRole.ADMIN);
+        DoctorDto doctorDto = (DoctorDto) httpRequest.getSession().getAttribute(SessionRole.getADMIN());
         return doctorDto != null && isIdTrue(httpRequest, doctorDto.getId());
     }
 

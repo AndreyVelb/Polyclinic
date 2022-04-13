@@ -1,6 +1,5 @@
 package service.doctor;
 
-import config.Config;
 import entity.AppointmentRecord;
 import entity.Doctor;
 import entity.Patient;
@@ -15,6 +14,7 @@ import repository.PatientRepository;
 import service.dto.doctor.AppointmentRecordRequestDto;
 import service.dto.doctor.DoctorDto;
 import service.dto.validator.DtoValidator;
+import util.ExceptionMessage;
 import util.SessionPool;
 import util.SessionRole;
 
@@ -22,8 +22,6 @@ import java.time.LocalDate;
 
 @RequiredArgsConstructor
 public class AppointmentRecordCreateService {
-
-    private final Config config;
 
     private final PatientRepository patientRepository;
     private final AppointmentRecordRepository appointmentRecordRepository;
@@ -35,13 +33,13 @@ public class AppointmentRecordCreateService {
         dtoValidator.validate(appointmentRecordRequestDto);
         Session session = SessionPool.getSession();
         try {
-            DoctorDto doctorDto = (DoctorDto) request.getSession().getAttribute(SessionRole.DOCTOR);
+            DoctorDto doctorDto = (DoctorDto) request.getSession().getAttribute(SessionRole.getDOCTOR());
             session.beginTransaction();
             Doctor doctor = doctorRepository.findById(doctorDto.getId(), SessionPool.getSession())
-                    .orElseThrow(() -> new DoctorNotFoundException(config.getDoctorNotFoundExMessage()));
+                    .orElseThrow(() -> new DoctorNotFoundException(ExceptionMessage.DOCTOR_NOT_FOUND));
             Long patientId = appointmentRecordRequestDto.getPatientId();
             Patient patient = patientRepository.findById(patientId, session)
-                    .orElseThrow(() -> new PatientNotFoundException(config.getPatientNotFoundExMessage()));
+                    .orElseThrow(() -> new PatientNotFoundException(ExceptionMessage.PATIENT_NOT_FOUND));
             AppointmentRecord appointmentRecordWithoutId = AppointmentRecord.builder()
                     .doctor(doctor)
                     .patient(patient)

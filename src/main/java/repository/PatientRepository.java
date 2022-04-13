@@ -1,8 +1,6 @@
 package repository;
 
-import config.Config;
 import entity.Patient;
-import exception.ServerTechnicalProblemsException;
 import org.hibernate.Session;
 
 import java.util.ArrayList;

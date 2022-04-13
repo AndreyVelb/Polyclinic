@@ -1,7 +1,14 @@
 package util;
 
+import lombok.Getter;
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class SessionRole {
-    public static final String DOCTOR = "DOCTOR";
-    public static final String ADMIN = "ADMIN";
-    public static final String PATIENT = "PATIENT";
+    @Getter
+    private static final String DOCTOR = "DOCTOR";
+    @Getter
+    private static final String ADMIN = "ADMIN";
+    @Getter
+    private static final String PATIENT = "PATIENT";
 }

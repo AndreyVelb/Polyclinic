@@ -3,8 +3,6 @@ package servlet.performer.doctor;
 import exception.DtoValidationException;
 import exception.MethodNotAllowedException;
 import exception.NotAuthenticatedException;
-import exception.PageNotFoundException;
-import exception.ServerTechnicalProblemsException;
 import exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +17,6 @@ import servlet.response.JsonResponse;
 import util.HttpMethod;
 import util.UrlPath;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
